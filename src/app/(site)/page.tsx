@@ -8,7 +8,7 @@ export default async function HomePage() {
   const newArrivalProducts = await getNewArrivals();
 
   return (
-    <main className="relative bg-white">
+    <main id="main-content" className="relative bg-white">
       <HomeScrollSnap />
       <Navbar variant="transparent" layout="hero" />
       <HeroCarousel />

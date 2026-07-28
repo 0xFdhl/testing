@@ -42,7 +42,7 @@ export default async function AccountPage() {
   const lastOrder = orders[0] ?? null;
 
   return (
-    <main className="min-h-screen bg-white">
+    <main id="main-content" className="min-h-screen bg-white">
       <Navbar variant="solid" layout="shop" />
 
       <div className="mx-auto max-w-3xl px-5 pt-28 pb-20 md:px-10 md:pt-32">

@@ -24,7 +24,7 @@ function FilterPill({
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "shrink-0 rounded-full border px-5 py-2 text-xs font-semibold tracking-wide transition-colors md:px-6 md:py-2.5 md:text-[13px]",
+        "shrink-0 rounded-full border px-5 py-2 text-xs font-semibold tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white md:px-6 md:py-2.5 md:text-[13px]",
         active
           ? "border-black bg-black text-white"
           : "border-black/25 bg-white text-black hover:border-black/50",

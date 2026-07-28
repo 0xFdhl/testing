@@ -35,7 +35,7 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   return (
     <a
       href={href}
-      className="font-sans text-sm text-white/90 transition-colors hover:text-white"
+      className="rounded-sm font-sans text-sm text-white/90 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     >
       {label}
     </a>
@@ -86,12 +86,12 @@ export function SiteFooter() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Adress"
-              className="w-full bg-transparent font-sans text-sm text-white placeholder:text-white/60 focus:outline-none"
+              className="w-full rounded-full bg-transparent font-sans text-sm text-white placeholder:text-white/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
             />
             <button
               type="submit"
               aria-label="Subscribe"
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-70"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={2} />
             </button>

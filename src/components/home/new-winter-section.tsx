@@ -12,7 +12,7 @@ export function NewWinterSection() {
         </p>
         <Link
           href="/shop"
-          className="mt-8 inline-flex h-12 items-center rounded-md bg-white px-8 text-sm font-medium text-black"
+          className="mt-8 inline-flex h-12 items-center rounded-md bg-white px-8 text-sm font-medium text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           Shop Now
         </Link>

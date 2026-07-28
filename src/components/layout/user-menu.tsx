@@ -162,7 +162,7 @@ export function UserMenu({ isLight }: { isLight: boolean }) {
             aria-haspopup="menu"
             onClick={handleToggle}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-1.5 py-1 outline-none",
+              "flex items-center gap-1.5 rounded-full px-1.5 py-1 outline-none focus-visible:ring-2 focus-visible:ring-current",
               COLOR_TRANSITION_CLASS,
               isLight ? "text-black/90 hover:text-black" : "text-white/90 hover:text-white",
               open && (isLight ? "bg-black/5" : "bg-white/10"),
@@ -224,8 +224,10 @@ export function UserMenu({ isLight }: { isLight: boolean }) {
                   role="menuitem"
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "flex items-center gap-2.5 px-4 py-2 text-sm",
-                    isLight ? "hover:bg-black/5" : "hover:bg-white/5",
+                    "flex items-center gap-2.5 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset",
+                    isLight
+                      ? "hover:bg-black/5 focus-visible:ring-black"
+                      : "hover:bg-white/5 focus-visible:ring-white",
                   )}
                 >
                   <UserIcon className="h-4 w-4 opacity-60" strokeWidth={1.5} />
@@ -239,8 +241,10 @@ export function UserMenu({ isLight }: { isLight: boolean }) {
                   role="menuitem"
                   onClick={handleSignOut}
                   className={cn(
-                    "flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm",
-                    isLight ? "hover:bg-black/5" : "hover:bg-white/5",
+                    "flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset",
+                    isLight
+                      ? "hover:bg-black/5 focus-visible:ring-black"
+                      : "hover:bg-white/5 focus-visible:ring-white",
                   )}
                 >
                   <LogOut className="h-4 w-4 opacity-60" strokeWidth={1.5} />
@@ -255,7 +259,7 @@ export function UserMenu({ isLight }: { isLight: boolean }) {
           href="/login"
           aria-label="Sign in"
           className={cn(
-            "flex items-center gap-1.5 rounded-full px-1.5 py-1",
+            "flex items-center gap-1.5 rounded-full px-1.5 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current",
             COLOR_TRANSITION_CLASS,
             isLight ? "text-black/90 hover:text-black hover:bg-black/5" : "text-white/90 hover:text-white hover:bg-white/10",
           )}

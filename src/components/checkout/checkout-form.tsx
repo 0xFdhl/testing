@@ -100,7 +100,7 @@ export function CheckoutForm({
           name="quantity"
           defaultValue={String(initialQuantity)}
           disabled={isPending}
-          className="w-full max-w-[8rem] rounded-md border border-black/20 bg-white px-3 py-2.5 text-sm text-black outline-none focus:border-black"
+          className="w-full max-w-[8rem] rounded-md border border-black/20 bg-white px-3 py-2.5 text-sm text-black outline-none focus:border-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         >
           {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
             <option key={n} value={n}>
@@ -152,7 +152,7 @@ export function CheckoutForm({
         type="submit"
         disabled={isPending}
         className={cn(
-          "h-12 w-full rounded-md bg-black text-sm font-medium tracking-wide text-white lowercase transition-opacity",
+          "h-12 w-full rounded-md bg-black text-sm font-medium tracking-wide text-white lowercase transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white",
           isPending ? "cursor-wait opacity-70" : "hover:opacity-85",
         )}
       >
@@ -194,10 +194,10 @@ function Field({
         disabled={disabled}
         required
         className={cn(
-          "w-full rounded-md border bg-white px-3 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-black/30",
+          "w-full rounded-md border bg-white px-3 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
           errors?.length
-            ? "border-red-500 focus:border-red-600"
-            : "border-black/20 focus:border-black",
+            ? "border-red-500 focus:border-red-600 focus-visible:ring-red-600"
+            : "border-black/20 focus:border-black focus-visible:ring-black",
         )}
       />
       {errors?.map((msg) => (

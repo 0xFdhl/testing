@@ -72,7 +72,7 @@ function NavLink({
       href={item.href}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
         active
           ? "bg-zinc-800 text-white"
           : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white",
@@ -109,7 +109,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     [section.title]: !isCollapsed,
                   }))
                 }
-                className="mb-2 flex w-full items-center justify-between px-3 text-xs font-medium uppercase tracking-wider text-zinc-500"
+                className="mb-2 flex w-full items-center justify-between rounded-sm px-3 text-xs font-medium uppercase tracking-wider text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               >
                 {section.title}
                 <ChevronDown
@@ -142,7 +142,7 @@ export function AdminSidebar() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 rounded-lg border border-zinc-700 bg-zinc-900 p-2 text-zinc-300 lg:hidden"
+        className="fixed left-4 top-4 z-40 rounded-lg border border-zinc-700 bg-zinc-900 p-2 text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 lg:hidden"
         aria-label="Open menu"
       >
         <Menu className="h-5 w-5" />
@@ -164,7 +164,7 @@ export function AdminSidebar() {
         <button
           type="button"
           onClick={() => setMobileOpen(false)}
-          className="absolute right-3 top-4 rounded p-1 text-zinc-400 hover:text-white lg:hidden"
+          className="absolute right-3 top-4 rounded p-1 text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 lg:hidden"
           aria-label="Close menu"
         >
           <X className="h-5 w-5" />

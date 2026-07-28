@@ -125,7 +125,7 @@ export function ProductInfoAccordions({
               aria-expanded={isOpen}
               aria-controls={panelId}
               onClick={() => toggleSection(accordion.id)}
-              className="flex w-full items-center justify-between py-5 text-left"
+              className="flex w-full items-center justify-between rounded-sm py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               <span className="text-xs font-medium tracking-[0.14em] text-black uppercase sm:text-sm">
                 {accordion.label}

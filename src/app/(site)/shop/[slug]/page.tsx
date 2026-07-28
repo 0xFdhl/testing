@@ -31,7 +31,7 @@ export default async function ProductPage({ params }: Props) {
   const relatedProducts = await getRelatedProducts(slug);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main id="main-content" className="min-h-screen bg-white">
       <ProductJsonLd product={product} />
       <Navbar variant="solid" layout="shop" />
       <div className="pt-[var(--navbar-height)] md:pt-[var(--navbar-height-md)]">

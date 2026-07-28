@@ -14,7 +14,7 @@ export default async function AdminProtectedLayout({
       <AdminSidebar />
       <div className="flex min-h-screen flex-1 flex-col">
         <AdminTopbar name={session.name} email={session.email} />
-        <main className="flex-1 p-4 lg:p-6">{children}</main>
+        <main id="main-content" className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );

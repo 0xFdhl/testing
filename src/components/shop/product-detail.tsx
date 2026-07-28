@@ -99,7 +99,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   current === "sizing" ? null : "sizing",
                 )
               }
-              className="text-[10px] font-medium tracking-[0.16em] text-black uppercase transition-opacity hover:opacity-60 sm:text-xs"
+              className="rounded-sm text-[clamp(11px,1vw+8px,12px)] font-medium tracking-[0.16em] text-black uppercase transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               Size guide
             </button>
@@ -117,7 +117,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   disabled={!available}
                   onClick={() => available && setSelectedSize(size)}
                   className={cn(
-                    "relative pb-1 text-sm font-medium tracking-wide uppercase transition-colors sm:text-base",
+                    "relative rounded-sm pb-1 text-sm font-medium tracking-wide uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:text-base",
                     active && available && "text-black",
                     !active && available && "text-black/40 hover:text-black/70",
                     !available && "cursor-not-allowed text-black/20",
@@ -141,7 +141,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           onClick={handleAddToCart}
           whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
           transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className="mt-8 flex w-full items-center justify-center gap-2.5 border border-black bg-white px-6 py-3.5 text-xs font-medium tracking-[0.14em] text-black uppercase transition-colors hover:bg-black/5 sm:mt-10 sm:text-sm"
+          className="mt-8 flex w-full items-center justify-center gap-2.5 border border-black bg-white px-6 py-3.5 text-xs font-medium tracking-[0.14em] text-black uppercase transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:mt-10 sm:text-sm"
         >
           <span className="relative inline-flex">
             <ShoppingBag className="h-4 w-4 stroke-[1.5]" aria-hidden />

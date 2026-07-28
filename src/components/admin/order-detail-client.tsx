@@ -60,7 +60,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
       <div>
         <Link
           href="/admin/orders"
-          className="text-sm text-zinc-400 hover:text-white"
+          className="rounded-sm text-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
         >
           ← Back to orders
         </Link>
@@ -117,7 +117,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
                     href={order.invoiceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-zinc-100 underline"
+                    className="rounded-sm text-zinc-100 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                   >
                     View invoice
                   </a>
@@ -189,7 +189,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
-              className="block rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500"
+              className="block rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             >
               {statuses.map((s) => (
                 <option key={s} value={s}>
@@ -207,7 +207,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
               <button
                 type="button"
                 disabled={pending || newStatus === order.status}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-100 disabled:opacity-50"
+                className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               >
                 {pending ? "Updating…" : "Update status"}
               </button>

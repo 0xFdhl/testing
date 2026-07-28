@@ -19,7 +19,7 @@ export function AdminTopbar({ name, email }: AdminTopbarProps) {
       <form action={logoutAction}>
         <button
           type="submit"
-          className="flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+          className="flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
         >
           <LogOut className="h-4 w-4" />
           Logout

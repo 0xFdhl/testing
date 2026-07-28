@@ -7,7 +7,10 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
+    <main
+      id="main-content"
+      className="flex min-h-screen flex-col items-center justify-center bg-white px-4"
+    >
       <h1 className="text-4xl font-bold text-black">Terjadi kesalahan</h1>
       <p className="mt-4 text-lg text-zinc-500">
         Maaf, terjadi kesalahan yang tidak terduga.

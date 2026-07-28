@@ -7,7 +7,7 @@ export function GoogleSignInButton({ callbackUrl = "/" }: { callbackUrl?: string
     <button
       type="button"
       onClick={() => signIn("google", { callbackUrl })}
-      className="flex w-full items-center justify-center gap-3 border border-black bg-white px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-black/5"
+      className="flex w-full items-center justify-center gap-3 border border-black bg-white px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
     >
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path

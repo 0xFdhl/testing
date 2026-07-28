@@ -18,9 +18,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
 
   if (!externalId) {
     return (
-      <main className="min-h-screen bg-white">
+      <main id="main-content" className="min-h-screen bg-white">
         <Navbar variant="solid" layout="shop" />
-        <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+        <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
           <h1 className="text-2xl font-bold text-black">Order tidak ditemukan</h1>
           <p className="mt-3 text-sm text-black/55">
             Link status pembayaran tidak valid.
@@ -40,9 +40,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
 
   if (!order) {
     return (
-      <main className="min-h-screen bg-white">
+      <main id="main-content" className="min-h-screen bg-white">
         <Navbar variant="solid" layout="shop" />
-        <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+        <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
           <h1 className="text-2xl font-bold text-black">Order tidak ditemukan</h1>
           <p className="mt-3 text-sm text-black/55">
             Order <span className="font-mono text-xs">{externalId}</span> tidak
@@ -60,9 +60,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main id="main-content" className="min-h-screen bg-white">
       <Navbar variant="solid" layout="shop" />
-      <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+      <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
         <p className="text-[11px] font-semibold tracking-[0.25em] text-black/45 uppercase">
           Payment
         </p>

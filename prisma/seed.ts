@@ -264,6 +264,115 @@ async function main() {
     console.log(`  ✓ ${p.slug} — ${p.name} (${p.category})`);
   }
 
+  console.log("Seeding orders...");
+
+  const customerPool = [
+    { name: "Andi Pratama", email: "andi@email.com", phone: "081234567890" },
+    { name: "Budi Santoso", email: "budi@email.com", phone: "081298765432" },
+    { name: "Citra Dewi", email: "citra@email.com", phone: "082134567890" },
+    { name: "Dian Kusuma", email: "dian@email.com", phone: "082156789012" },
+    { name: "Eko Wijaya", email: "eko@email.com", phone: "083178901234" },
+    { name: "Fitri Handayani", email: "fitri@email.com", phone: "083189012345" },
+    { name: "Gilang Permana", email: "gilang@email.com", phone: "085190123456" },
+    { name: "Hana Safira", email: "hana@email.com", phone: "085201234567" },
+    { name: "Irfan Maulana", email: "irfan@email.com", phone: "086212345678" },
+    { name: "Joko Susilo", email: "joko@email.com", phone: "086223456789" },
+  ];
+
+  const allProducts = await prisma.product.findMany();
+
+  function randomItem<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function randomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const orderStatuses: Array<{
+    status: "PAID" | "PENDING" | "EXPIRED" | "CANCELLED";
+    weight: number;
+  }> = [
+    { status: "PAID", weight: 60 },
+    { status: "PENDING", weight: 15 },
+    { status: "EXPIRED", weight: 10 },
+    { status: "CANCELLED", weight: 15 },
+  ];
+
+  function pickStatus(): "PAID" | "PENDING" | "EXPIRED" | "CANCELLED" {
+    const totalWeight = orderStatuses.reduce((s, o) => s + o.weight, 0);
+    let r = Math.random() * totalWeight;
+    for (const entry of orderStatuses) {
+      r -= entry.weight;
+      if (r <= 0) return entry.status;
+    }
+    return "PAID";
+  }
+
+  function hoursAgo(h: number): Date {
+    const d = new Date();
+    d.setHours(d.getHours() - h);
+    return d;
+  }
+
+  const totalOrders = 35;
+
+  for (let i = 0; i < totalOrders; i++) {
+    const customer = randomItem(customerPool);
+    const product = randomItem(allProducts);
+    const qty = randomInt(1, 3);
+    const size = randomItem(product.sizes as string[]);
+    const lineItems = [
+      {
+        productSlug: product.slug,
+        productName: product.name,
+        size,
+        quantity: qty,
+        unitPrice: product.price,
+      },
+    ];
+    const amount = product.price * qty;
+
+    const status = pickStatus();
+    const createdAt = hoursAgo(randomInt(1, 720)); // 1h to 30d ago
+    const paidAt = status === "PAID" ? new Date(createdAt.getTime() + randomInt(5, 120) * 60000) : null;
+    const expiredAt = status === "EXPIRED" ? new Date(createdAt.getTime() + 24 * 3600 * 1000) : null;
+    const cancelledAt = status === "CANCELLED" ? new Date(createdAt.getTime() + randomInt(5, 60) * 60000) : null;
+
+    const externalId = `ORD-SEED-${i.toString().padStart(3, "0")}-${Date.now().toString(36)}`;
+
+    await prisma.order.upsert({
+      where: { externalId },
+      update: {
+        status,
+        lineItems: lineItems as object,
+        amount,
+        customerName: customer.name,
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        paidAt,
+        expiredAt,
+        cancelledAt,
+        createdAt,
+      },
+      create: {
+        externalId,
+        status,
+        lineItems: lineItems as object,
+        amount,
+        customerName: customer.name,
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        paidAt,
+        expiredAt,
+        cancelledAt,
+        createdAt,
+      },
+    });
+  }
+
+  console.log(`  ✓ ${totalOrders} orders seeded`);
+
   console.log("Seed complete.");
 }
 

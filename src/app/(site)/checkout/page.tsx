@@ -65,9 +65,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   if (from === "cart") {
     return (
-      <main className="min-h-screen bg-white">
+      <main id="main-content" className="min-h-screen bg-white">
         <Navbar variant="solid" layout="shop" />
-        <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+        <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
           <p className="text-[11px] font-semibold tracking-[0.25em] text-black/45 uppercase">
             Checkout
           </p>
@@ -84,9 +84,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   if (!slug) {
     return (
-      <main className="min-h-screen bg-white">
+      <main id="main-content" className="min-h-screen bg-white">
         <Navbar variant="solid" layout="shop" />
-        <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+        <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
           <p className="text-[11px] font-semibold tracking-[0.25em] text-black/45 uppercase">
             Checkout
           </p>
@@ -119,9 +119,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const defaultQty = parseQty(qty);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main id="main-content" className="min-h-screen bg-white">
       <Navbar variant="solid" layout="shop" />
-      <div className="mx-auto max-w-lg px-5 pt-28 pb-20 md:px-10 md:pt-32">
+      <div className="mx-auto max-w-xl px-5 pt-28 pb-20 md:px-10 md:pt-32 lg:max-w-2xl">
         <p className="text-[11px] font-semibold tracking-[0.25em] text-black/45 uppercase">
           Checkout
         </p>

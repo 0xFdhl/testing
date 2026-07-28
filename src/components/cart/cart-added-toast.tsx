@@ -60,7 +60,7 @@ export function CartAddedToast() {
               onClick={dismissAddedToast}
               aria-label="Close notification"
               whileTap={prefersReducedMotion ? undefined : { scale: 0.88 }}
-              className="text-black/45 transition-colors hover:text-black"
+              className="rounded-sm text-black/45 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               <X className="h-4 w-4" />
             </motion.button>
@@ -104,7 +104,7 @@ export function CartAddedToast() {
               <Link
                 href={checkoutHref}
                 onClick={dismissAddedToast}
-                className="flex h-9 w-full items-center justify-center rounded-sm bg-black text-xs font-medium text-white lowercase transition-opacity hover:opacity-85"
+                className="flex h-9 w-full items-center justify-center rounded-sm bg-black text-xs font-medium text-white lowercase transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 buy now
               </Link>
@@ -116,7 +116,7 @@ export function CartAddedToast() {
                 dismissAddedToast();
                 openCart();
               }}
-              className="flex h-9 flex-1 items-center justify-center rounded-sm bg-black text-xs font-medium text-white lowercase transition-opacity hover:opacity-85"
+              className="flex h-9 flex-1 items-center justify-center rounded-sm bg-black text-xs font-medium text-white lowercase transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               view cart
             </motion.button>

@@ -12,7 +12,10 @@ export function Logo({ variant = "light", className, size = "default" }: LogoPro
   return (
     <Link
       href="/"
-      className={cn("relative block shrink-0", className)}
+      className={cn(
+        "relative block shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current",
+        className,
+      )}
       aria-label=".bbr home"
     >
       <span

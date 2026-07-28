@@ -61,7 +61,7 @@ export function WebhooksMonitor({
         <button
           type="button"
           onClick={refresh}
-          className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800"
+          className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
         >
           Refresh now
         </button>
@@ -96,7 +96,7 @@ export function WebhooksMonitor({
                     <button
                       type="button"
                       onClick={() => setSelected(event)}
-                      className="text-sm text-zinc-300 hover:text-white hover:underline"
+                      className="rounded-sm text-sm text-zinc-300 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                     >
                       View JSON
                     </button>
@@ -109,7 +109,7 @@ export function WebhooksMonitor({
                         trigger={
                           <button
                             type="button"
-                            className="text-sm text-amber-400 hover:text-amber-300"
+                            className="rounded-sm text-sm text-amber-400 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                           >
                             Retry
                           </button>
@@ -136,7 +136,7 @@ export function WebhooksMonitor({
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="text-zinc-400 hover:text-white"
+                className="rounded-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900"
               >
                 Close
               </button>

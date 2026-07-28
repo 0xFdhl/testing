@@ -45,7 +45,7 @@ export function CartModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: DURATION_MODAL, ease: EASE_OUT }}
-            className="absolute inset-0 bg-black/45"
+            className="absolute inset-0 bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
             onClick={closeCart}
           />
 
@@ -69,7 +69,7 @@ export function CartModal() {
                 : { opacity: 0, y: 16, scale: 0.98 }
             }
             transition={{ duration: DURATION_MODAL, ease: EASE_OUT }}
-            className="relative flex max-h-[min(90svh,40rem)] w-full max-w-md flex-col rounded-sm bg-white shadow-[0_20px_60px_rgba(0,0,0,0.2)]"
+            className="relative flex max-h-[min(80dvh,34rem)] w-[calc(100%-2rem)] max-w-md flex-col rounded-sm bg-white shadow-[0_20px_60px_rgba(0,0,0,0.2)] md:max-h-[min(80dvh,40rem)]"
           >
             <div className="flex items-center justify-between border-b border-black/8 px-5 py-4">
               <h2 id="cart-modal-title" className="text-lg font-bold text-black">
@@ -80,7 +80,7 @@ export function CartModal() {
                 onClick={closeCart}
                 aria-label="Close cart"
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.88 }}
-                className="text-black/45 transition-colors hover:text-black"
+                className="rounded-sm text-black/45 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 <X className="h-5 w-5" />
               </motion.button>
@@ -98,7 +98,7 @@ export function CartModal() {
                   <Link
                     href="/shop"
                     onClick={closeCart}
-                    className="mt-4 inline-block text-xs font-semibold tracking-[0.15em] text-black uppercase underline-offset-4 hover:underline"
+                    className="mt-4 inline-block rounded-sm text-xs font-semibold tracking-[0.15em] text-black uppercase underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                   >
                     Browse catalog
                   </Link>
@@ -150,7 +150,7 @@ export function CartModal() {
                               onClick={() =>
                                 updateQuantity(item.id, item.quantity - 1)
                               }
-                              className="flex w-8 items-center justify-center transition-opacity hover:opacity-80"
+                              className="flex w-8 items-center justify-center transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                             >
                               <Minus className="h-3.5 w-3.5" />
                             </motion.button>
@@ -176,7 +176,7 @@ export function CartModal() {
                                 updateQuantity(item.id, item.quantity + 1)
                               }
                               className={cn(
-                                "flex w-8 items-center justify-center transition-opacity hover:opacity-80",
+                                "flex w-8 items-center justify-center transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
                                 item.quantity >= 10 &&
                                   "cursor-not-allowed opacity-40",
                               )}
@@ -191,7 +191,7 @@ export function CartModal() {
                           aria-label={`Remove ${item.productName}`}
                           whileTap={prefersReducedMotion ? undefined : { scale: 0.88 }}
                           onClick={() => removeItem(item.id)}
-                          className="shrink-0 self-start pt-0.5 text-black/35 transition-colors hover:text-black"
+                          className="shrink-0 self-start rounded-sm pt-0.5 text-black/35 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                         >
                           <X className="h-4 w-4" />
                         </motion.button>
@@ -227,7 +227,7 @@ export function CartModal() {
                     <Link
                       href="/checkout?from=cart"
                       onClick={closeCart}
-                      className="flex h-11 w-full items-center justify-center rounded-sm bg-black text-sm font-medium text-white lowercase transition-opacity hover:opacity-85"
+                      className="flex h-11 w-full items-center justify-center rounded-sm bg-black text-sm font-medium text-white lowercase transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                     >
                       checkout
                     </Link>

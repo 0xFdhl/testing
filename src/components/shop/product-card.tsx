@@ -25,7 +25,10 @@ export function ProductCard({
       transition={{ duration: 0.4, delay: index * 0.04, ease: "easeOut" }}
       className="group"
     >
-      <Link href={`/shop/${product.slug}`} className="block">
+      <Link
+        href={`/shop/${product.slug}`}
+        className="block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+      >
         <div
           className={
             isCatalog
@@ -60,10 +63,10 @@ export function ProductCard({
         </div>
         {!isCatalog && (
           <div className="mt-1.5 space-y-0">
-            <p className="text-[9px] font-bold tracking-[0.12em] text-black uppercase">
+            <p className="text-[clamp(11px,1vw+8px,12px)] font-bold tracking-[0.12em] text-black uppercase">
               {product.name}
             </p>
-            <p className="text-[9px] font-medium text-black/55">
+            <p className="text-[clamp(11px,1vw+8px,12px)] font-medium text-black/55">
               {formatIdr(product.price)}
             </p>
           </div>

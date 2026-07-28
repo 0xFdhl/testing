@@ -43,7 +43,7 @@ export function CartCheckoutForm({
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase"
+          className="mt-6 inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         >
           ke shop
         </Link>
@@ -175,7 +175,7 @@ function CheckoutFields({
         type="submit"
         disabled={isPending}
         className={cn(
-          "h-12 w-full rounded-md bg-black text-sm font-medium tracking-wide text-white lowercase transition-opacity",
+          "h-12 w-full rounded-md bg-black text-sm font-medium tracking-wide text-white lowercase transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white",
           isPending ? "cursor-wait opacity-70" : "hover:opacity-85",
         )}
       >
@@ -215,10 +215,10 @@ function Field({
         disabled={disabled}
         required
         className={cn(
-          "w-full rounded-md border bg-white px-3 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-black/30",
+          "w-full rounded-md border bg-white px-3 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
           errors?.length
-            ? "border-red-500 focus:border-red-600"
-            : "border-black/20 focus:border-black",
+            ? "border-red-500 focus:border-red-600 focus-visible:ring-red-600"
+            : "border-black/20 focus:border-black focus-visible:ring-black",
         )}
       />
       {errors?.map((msg) => (

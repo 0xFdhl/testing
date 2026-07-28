@@ -26,7 +26,7 @@ export function AnimatedMenuButton({
       onClick={onClick}
       whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
       className={cn(
-        "relative z-10 flex h-9 w-9 items-center justify-center md:hidden",
+        "relative z-10 flex h-9 w-9 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current md:hidden",
         className,
       )}
     >

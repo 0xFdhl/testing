@@ -128,7 +128,7 @@ export function NavSearch({ open, onClose, isLight }: NavSearchProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[80] bg-black/45"
+            className="fixed inset-0 z-[80] bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
             onClick={handleClose}
           />
           <motion.div
@@ -163,17 +163,20 @@ export function NavSearch({ open, onClose, isLight }: NavSearchProps) {
                   spellCheck={false}
                   maxLength={MAX_SEARCH_QUERY_LENGTH}
                   className={cn(
-                    "min-w-0 flex-1 border-b bg-transparent py-2 text-sm tracking-wide outline-none placeholder:opacity-45",
+                    "min-w-0 flex-1 border-b bg-transparent py-2 text-sm tracking-wide outline-none placeholder:opacity-45 focus-visible:ring-2 focus-visible:ring-offset-2",
                     isLight
-                      ? "border-black/20 focus:border-black/50"
-                      : "border-white/20 focus:border-white/50",
+                      ? "border-black/20 focus:border-black/50 focus-visible:ring-black focus-visible:ring-offset-white"
+                      : "border-white/20 focus:border-white/50 focus-visible:ring-white focus-visible:ring-offset-[#0A0A0A]",
                   )}
                 />
                 <button
                   type="submit"
                   disabled={!normalizedQuery}
                   className={cn(
-                    "shrink-0 text-[11px] font-semibold tracking-[0.22em] uppercase transition-opacity",
+                    "shrink-0 rounded-sm text-[11px] font-semibold tracking-[0.22em] uppercase transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                    isLight
+                      ? "focus-visible:ring-black focus-visible:ring-offset-white"
+                      : "focus-visible:ring-white focus-visible:ring-offset-[#0A0A0A]",
                     normalizedQuery ? "opacity-100" : "opacity-35",
                   )}
                 >
@@ -194,7 +197,7 @@ export function NavSearch({ open, onClose, isLight }: NavSearchProps) {
                           <Link
                             href={`/shop/${product.slug}`}
                             onClick={handleClose}
-                            className="flex items-center gap-4 py-3 transition-opacity hover:opacity-70"
+                            className="flex items-center gap-4 rounded-sm py-3 transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
                           >
                             <div className="relative h-14 w-11 shrink-0 overflow-hidden bg-neutral-200">
                               <Image

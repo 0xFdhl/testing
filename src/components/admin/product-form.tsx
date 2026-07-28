@@ -89,7 +89,7 @@ export function ProductForm({ product }: ProductFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
           </label>
 
@@ -105,13 +105,13 @@ export function ProductForm({ product }: ProductFormProps) {
                 }}
                 required
                 pattern="[a-z0-9-]+"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               />
               {!isEdit && (
                 <button
                   type="button"
                   onClick={() => setAutoSlug(true)}
-                  className="shrink-0 rounded-lg border border-zinc-700 px-3 text-xs text-zinc-400 hover:text-white"
+                  className="shrink-0 rounded-lg border border-zinc-700 px-3 text-xs text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                 >
                   Auto
                 </button>
@@ -126,7 +126,7 @@ export function ProductForm({ product }: ProductFormProps) {
             name="description"
             defaultValue={product?.description ?? ""}
             rows={4}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           />
         </label>
 
@@ -136,7 +136,7 @@ export function ProductForm({ product }: ProductFormProps) {
             <select
               name="category"
               defaultValue={product?.category ?? "jacket"}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             >
               {productCategories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -155,7 +155,7 @@ export function ProductForm({ product }: ProductFormProps) {
               step={1}
               defaultValue={product?.price ?? ""}
               required
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
           </label>
         </div>
@@ -167,7 +167,7 @@ export function ProductForm({ product }: ProductFormProps) {
           <button
             type="button"
             onClick={() => setImages([...images, ""])}
-            className="text-sm text-zinc-400 hover:text-white"
+            className="rounded-sm text-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             + Add URL
           </button>
@@ -179,13 +179,14 @@ export function ProductForm({ product }: ProductFormProps) {
               value={url}
               onChange={(e) => updateListItem(images, setImages, i, e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
             {images.length > 1 && (
               <button
                 type="button"
+                aria-label={`Remove image URL ${i + 1}`}
                 onClick={() => removeListItem(images, setImages, i)}
-                className="rounded-lg border border-zinc-700 px-3 text-zinc-400 hover:text-red-400"
+                className="rounded-lg border border-zinc-700 px-3 text-zinc-400 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               >
                 ×
               </button>
@@ -205,7 +206,7 @@ export function ProductForm({ product }: ProductFormProps) {
                 type="number"
                 min={0}
                 defaultValue={getStockValue(product?.stock, size)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               />
             </label>
           ))}
@@ -220,7 +221,7 @@ export function ProductForm({ product }: ProductFormProps) {
             <input
               name="badge"
               defaultValue={product?.badge ?? ""}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
           </label>
           <label className="block space-y-1.5">
@@ -228,7 +229,7 @@ export function ProductForm({ product }: ProductFormProps) {
             <input
               name="colorLabel"
               defaultValue={product?.colorLabel ?? ""}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
           </label>
           <label className="block space-y-1.5">
@@ -236,7 +237,7 @@ export function ProductForm({ product }: ProductFormProps) {
             <input
               name="fitNote"
               defaultValue={product?.fitNote ?? ""}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             />
           </label>
         </div>
@@ -265,7 +266,7 @@ export function ProductForm({ product }: ProductFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-100 disabled:opacity-50"
+          className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
         >
           {pending ? "Saving…" : isEdit ? "Save Changes" : "Create Product"}
         </button>
@@ -292,7 +293,7 @@ function RepeatableFieldGroup({
         <button
           type="button"
           onClick={() => setItems([...items, ""])}
-          className="text-sm text-zinc-400 hover:text-white"
+          className="rounded-sm text-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
         >
           + Add
         </button>
@@ -307,13 +308,14 @@ function RepeatableFieldGroup({
               next[i] = e.target.value;
               setItems(next);
             }}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           />
           {items.length > 1 && (
             <button
               type="button"
+              aria-label={`Remove ${title} item ${i + 1}`}
               onClick={() => setItems(items.filter((_, idx) => idx !== i))}
-              className="rounded-lg border border-zinc-700 px-3 text-zinc-400 hover:text-red-400"
+              className="rounded-lg border border-zinc-700 px-3 text-zinc-400 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             >
               ×
             </button>

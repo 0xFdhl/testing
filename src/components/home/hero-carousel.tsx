@@ -57,7 +57,7 @@ export function HeroCarousel() {
         >
           <Link
             href={slide.href ?? "#"}
-            className="relative block h-full w-full"
+            className="relative block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
             aria-label={`Shop ${slide.alt}`}
           >
           <Image
@@ -65,7 +65,7 @@ export function HeroCarousel() {
             alt={slide.alt}
             fill
             priority={index === 0}
-            className="object-cover object-[40%_35%] contrast-[1.14] brightness-[1.00] saturate-10 sm:object-[45%_40%] md:object-[50%_45%] lg:object-[55%_50%]"
+            className="object-cover object-center contrast-[1.14] brightness-[1.00] saturate-10"
             sizes="100vw"
             quality={90}
           />
@@ -79,7 +79,7 @@ export function HeroCarousel() {
             type="button"
             aria-label="Previous slide"
             onClick={prev}
-            className="absolute top-1/2 left-4 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-black backdrop-blur-sm transition-opacity hover:opacity-80 sm:left-6"
+            className="absolute top-1/2 left-4 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-black backdrop-blur-sm transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:left-6"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -87,7 +87,7 @@ export function HeroCarousel() {
             type="button"
             aria-label="Next slide"
             onClick={next}
-            className="absolute top-1/2 right-4 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-black backdrop-blur-sm transition-opacity hover:opacity-80 sm:right-6"
+            className="absolute top-1/2 right-4 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-black backdrop-blur-sm transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:right-6"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -99,7 +99,7 @@ export function HeroCarousel() {
                 type="button"
                 aria-label={`Go to slide ${i + 1}`}
                 onClick={() => goTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                   i === index ? "w-6 bg-black" : "w-1.5 bg-black/30"
                 }`}
               />

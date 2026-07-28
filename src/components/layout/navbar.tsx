@@ -80,20 +80,20 @@ function NavMenuItem({
 }: NavMenuItemProps) {
   return (
     <li>
-      <Link
-        href={link.href}
-        className={cn(
-          "relative z-10 block whitespace-nowrap text-[10px] font-semibold tracking-[0.18em] sm:text-[11px] sm:tracking-[0.22em] lg:text-xs",
-          COLOR_TRANSITION_CLASS,
-          isLight ? "text-black/90" : "text-white/90",
-          isActive && "opacity-100",
-          !isActive && "opacity-55 hover:opacity-100",
-        )}
-        onMouseEnter={onHoverStart}
-        onMouseLeave={onHoverEnd}
-      >
-        {link.label}
-      </Link>
+        <Link
+          href={link.href}
+          className={cn(
+            "relative z-10 block whitespace-nowrap rounded-sm py-2 text-[clamp(11px,1vw+8px,12px)] font-semibold tracking-[0.18em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current sm:tracking-[0.22em]",
+            COLOR_TRANSITION_CLASS,
+            isLight ? "text-black/90" : "text-white/90",
+            isActive && "opacity-100",
+            !isActive && "opacity-55 hover:opacity-100",
+          )}
+          onMouseEnter={onHoverStart}
+          onMouseLeave={onHoverEnd}
+        >
+          {link.label}
+        </Link>
     </li>
   );
 }
@@ -115,7 +115,7 @@ function NavbarActionButton({
       whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       className={cn(
-        "relative z-10 flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.22em] lg:text-xs",
+        "relative z-10 flex items-center gap-1.5 rounded-sm text-[11px] font-semibold tracking-[0.22em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current lg:text-xs",
         COLOR_TRANSITION_CLASS,
         isLight ? "text-black/90 hover:text-black" : "text-white/90 hover:text-white",
       )}
@@ -377,7 +377,7 @@ export function Navbar({
                             <Link
                               href={link.href}
                               className={cn(
-                                "block whitespace-nowrap text-[10px] font-semibold tracking-[0.18em] text-white uppercase sm:text-[11px] sm:tracking-[0.2em] lg:text-xs",
+                                "block whitespace-nowrap rounded-sm py-2 text-[clamp(11px,1vw+8px,12px)] font-semibold tracking-[0.18em] text-white uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:tracking-[0.2em]",
                                 isLinkActive(link.href)
                                   ? "opacity-100"
                                   : "opacity-75 hover:opacity-100",
@@ -459,7 +459,7 @@ export function Navbar({
                               damping: 26,
                             }}
                             className={cn(
-                              "absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[9px] font-bold",
+                              "absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[clamp(11px,1vw+8px,12px)] font-bold leading-none",
                               isShopLayout || !isLightSurface
                                 ? "bg-white text-black"
                                 : "bg-black text-white",
@@ -565,7 +565,7 @@ export function Navbar({
                               damping: 26,
                             }}
                             className={cn(
-                              "absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[9px] font-bold",
+                              "absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[clamp(11px,1vw+8px,12px)] font-bold leading-none",
                               isLightSurface
                                 ? "bg-black text-white"
                                 : "bg-white text-black",

@@ -13,7 +13,7 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
     <article className="group flex w-full shrink-0 flex-col">
       <Link
         href={`/shop/${product.slug}`}
-        className="block"
+        className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={product.name}
       >
         <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-neutral-100 sm:rounded-lg">
@@ -30,7 +30,7 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
           <p className="text-[11px] font-semibold tracking-[0.02em] text-black sm:text-xs">
             {product.name}
           </p>
-          <p className="text-[10px] text-neutral-400 sm:text-[11px]">
+          <p className="text-[clamp(11px,1vw+8px,12px)] text-neutral-400">
             {formatIdr(product.price)}
           </p>
           <ul className="flex items-center gap-1.5 pt-0.5" aria-label="Color options">

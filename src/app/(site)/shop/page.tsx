@@ -24,7 +24,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const allProducts = await getAllProducts();
 
   return (
-    <main className="min-h-screen bg-white pb-20 md:pb-0">
+    <main id="main-content" className="min-h-screen bg-white pb-20 md:pb-0">
       <Navbar variant="solid" layout="shop" />
       <div className="pt-[var(--navbar-height)] md:pt-[var(--navbar-height-md)]">
         <ShopBanner />

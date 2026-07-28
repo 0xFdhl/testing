@@ -24,6 +24,8 @@ export default async function AdminDashboardPage() {
   const startOfDay = new Date(now);
   startOfDay.setHours(0, 0, 0, 0);
 
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
   const sevenDaysAgo = new Date(now);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
   sevenDaysAgo.setHours(0, 0, 0, 0);
@@ -33,6 +35,8 @@ export default async function AdminDashboardPage() {
     totalOrders,
     pendingOrders,
     todayRevenue,
+    totalRevenue,
+    monthRevenue,
     recentOrders,
     ordersLast7Days,
   ] = await Promise.all([
@@ -41,6 +45,14 @@ export default async function AdminDashboardPage() {
     prisma.order.count({ where: { status: "PENDING" } }),
     prisma.order.aggregate({
       where: { status: "PAID", paidAt: { gte: startOfDay } },
+      _sum: { amount: true },
+    }),
+    prisma.order.aggregate({
+      where: { status: "PAID" },
+      _sum: { amount: true },
+    }),
+    prisma.order.aggregate({
+      where: { status: "PAID", paidAt: { gte: startOfMonth } },
       _sum: { amount: true },
     }),
     prisma.order.findMany({
@@ -90,6 +102,22 @@ export default async function AdminDashboardPage() {
         <StatCard
           title="Today&apos;s Revenue"
           value={formatIdr(todayRevenue._sum.amount ?? 0)}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StatCard
+          title="Total Revenue"
+          value={formatIdr(totalRevenue._sum.amount ?? 0)}
+          subtitle="All time paid orders"
+        />
+        <StatCard
+          title="This Month Revenue"
+          value={formatIdr(monthRevenue._sum.amount ?? 0)}
+          subtitle={new Intl.DateTimeFormat("id-ID", {
+            month: "long",
+            year: "numeric",
+          }).format(now)}
         />
       </div>
 

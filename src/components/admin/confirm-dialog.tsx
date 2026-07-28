@@ -56,7 +56,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800"
+              className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900"
             >
               Cancel
             </button>
@@ -65,7 +65,7 @@ export function ConfirmDialog({
               disabled={loading}
               onClick={handleConfirm}
               className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50",
+                "rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
                 variant === "danger"
                   ? "bg-red-600 hover:bg-red-500"
                   : "bg-zinc-100 text-zinc-900 hover:bg-white",

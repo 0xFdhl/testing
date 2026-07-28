@@ -19,7 +19,7 @@ export function YouMayLike({ products }: YouMayLikeProps) {
           <Link
             key={product.id}
             href={`/shop/${product.slug}`}
-            className="group block"
+            className="group block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white">
               <Image
@@ -31,10 +31,10 @@ export function YouMayLike({ products }: YouMayLikeProps) {
               />
             </div>
             <div className="mt-2 space-y-0.5 sm:mt-2">
-              <p className="truncate text-[10px] font-bold tracking-[0.08em] text-black uppercase sm:text-[11px] md:text-xs">
+              <p className="truncate text-[clamp(11px,1vw+8px,12px)] font-bold tracking-[0.08em] text-black uppercase">
                 {product.name}
               </p>
-              <p className="text-[10px] font-medium text-black/55 sm:text-[11px] md:text-xs">
+              <p className="text-[clamp(11px,1vw+8px,12px)] font-medium text-black/55">
                 {formatIdr(product.price)}
               </p>
             </div>

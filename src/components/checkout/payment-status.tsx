@@ -90,7 +90,7 @@ export function PaymentStatus({ order }: PaymentStatusProps) {
         {order.status === "PENDING" && order.invoiceUrl && (
           <a
             href={order.invoiceUrl}
-            className="inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase transition-opacity hover:opacity-85"
+            className="inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             buka halaman bayar
           </a>
@@ -102,14 +102,14 @@ export function PaymentStatus({ order }: PaymentStatusProps) {
                 ? `/checkout?slug=${order.lineItems[0].productSlug}&size=${order.lineItems[0].size}`
                 : "/checkout?from=cart"
             }
-            className="inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase transition-opacity hover:opacity-85"
+            className="inline-flex h-11 items-center rounded-md bg-black px-6 text-sm font-medium text-white lowercase transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             checkout ulang
           </Link>
         )}
         <Link
           href="/shop"
-          className="inline-flex h-11 items-center rounded-md border border-black/25 px-6 text-sm font-medium text-black transition-colors hover:border-black"
+          className="inline-flex h-11 items-center rounded-md border border-black/25 px-6 text-sm font-medium text-black transition-colors hover:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         >
           kembali ke shop
         </Link>

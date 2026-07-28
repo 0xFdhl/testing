@@ -32,7 +32,7 @@ export function MobileMenuDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/40"
+            className="fixed inset-0 z-[60] bg-black/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
             onClick={onClose}
           />
           <motion.div
@@ -41,7 +41,7 @@ export function MobileMenuDrawer({
             exit={{ x: "-100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className={cn(
-              "fixed inset-y-0 left-0 z-[70] flex w-[min(100vw,320px)] flex-col px-6 pb-8 pt-[calc(var(--navbar-height)+1.5rem)]",
+              "fixed inset-y-0 left-0 z-[70] flex w-[min(80vw,320px)] flex-col px-6 pb-8 pt-[calc(var(--navbar-height)+1.5rem)] sm:w-[min(60vw,320px)] md:w-[min(45vw,380px)]",
               isDark ? "bg-[#0A0A0A] text-white" : "bg-[#f5f3ef] text-black",
             )}
           >
@@ -59,7 +59,7 @@ export function MobileMenuDrawer({
                         href={link.href}
                         onClick={onClose}
                         className={cn(
-                          "text-sm font-semibold tracking-[0.2em]",
+                          "block rounded-sm py-2.5 text-sm font-semibold tracking-[0.2em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current",
                           active ? "opacity-100" : "opacity-50",
                         )}
                       >
