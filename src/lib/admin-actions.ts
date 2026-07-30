@@ -221,20 +221,14 @@ export async function retryWebhookAction(eventId: string): Promise<ActionResult>
     }
 
     const { isPaidStatus } = await import("@/lib/xendit");
-    const { getOrderByExternalId, updateOrderByExternalId } = await import("@/lib/orders");
+    const { getOrderByExternalId, transitionOrderStatus } = await import("@/lib/orders");
 
     const order = await getOrderByExternalId(payload.external_id);
     if (order && order.status === "PENDING") {
       if (isPaidStatus(payload.status as "PENDING" | "PAID" | "SETTLED" | "EXPIRED")) {
-        await updateOrderByExternalId(payload.external_id, {
-          status: "PAID",
-          paidAt: new Date(),
-        });
+        await transitionOrderStatus(payload.external_id, "PENDING", "PAID", { paidAt: new Date() });
       } else if (payload.status === "EXPIRED") {
-        await updateOrderByExternalId(payload.external_id, {
-          status: "EXPIRED",
-          expiredAt: new Date(),
-        });
+        await transitionOrderStatus(payload.external_id, "PENDING", "EXPIRED", { expiredAt: new Date() });
       }
     }
 

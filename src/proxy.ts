@@ -9,7 +9,7 @@ export function proxy() {
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,
-    `connect-src 'self' https://api.xendit.co https://*.supabase.co`,
+    `connect-src 'self' https://api.xendit.co https://api.stripe.com https://*.supabase.co`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,

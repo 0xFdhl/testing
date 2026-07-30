@@ -1,3 +1,4 @@
+import "server-only";
 import { timingSafeEqual } from "node:crypto";
 import { getXenditSecretKey, getXenditWebhookToken } from "./config";
 import { XenditError } from "./errors";

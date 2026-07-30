@@ -37,7 +37,7 @@ const products = [
     price: 299_000,
     description:
       "A lightweight yet durable insulated jacket engineered for cold-weather performance. Features a water-repellent shell, thermal lining, and articulated sleeves for full mobility on the mountain.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/hoodie-zipp-diagonal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 10, L: 15, XL: 7 },
     badge: "Best Seller",
@@ -54,7 +54,7 @@ const products = [
     price: 459_000,
     description:
       "Premium down parka with 800-fill goose down and a storm-proof outer shell. Designed for extreme cold with a detachable hood, fleece-lined pockets, and adjustable hem.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/stella-noctis-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 6, L: 10, XL: 4 },
     badge: "New",
@@ -71,7 +71,7 @@ const products = [
     price: 199_000,
     description:
       "Versatile softshell jacket for high-output activities. Breathable, stretch-woven fabric with a DWR finish blocks light snow and wind while keeping you comfortable on the ascent.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/stella-noctis-thermal-1.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 5, S: 8, M: 15, L: 12, XL: 6 },
     colorLabel: "Grey / Blue / Red",
@@ -88,7 +88,7 @@ const products = [
     price: 549_000,
     description:
       "An all-mountain freestyle snowboard with a true twin shape and medium flex. Sintered base for speed, poplar core for snap, and carbon stringers for stability at high speed.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/ashley-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 5, L: 8, XL: 3 },
     badge: "Popular",
@@ -105,7 +105,7 @@ const products = [
     price: 729_000,
     description:
       "Built for backcountry touring. Camber profile underfoot provides edge hold on firm snow, while the rockered tips keep you floating in powder. Includes hardware and split-specific bindings.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/asuka-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 4, L: 6, XL: 2 },
     colorLabel: "Camo / Black",
@@ -121,7 +121,7 @@ const products = [
     price: 259_000,
     description:
       "Heat-moldable liner, BOA lacing system, and a medium-stiff flex for all-mountain riding. Vibram outsole grips icy parking lots and the cushioned insole absorbs hard landings.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/rem-boxy-tshirt.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 12, L: 10, XL: 5 },
     badge: "Eco",
@@ -139,7 +139,7 @@ const products = [
     price: 649_000,
     description:
       "A versatile all-mountain ski with a 95mm waist, titanal laminate for dampening, and a early-rise tip for effortless turn initiation. Equally at home on groomers and in moguls.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/hoodie-zipp-diagonal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 6, L: 9, XL: 4 },
     badge: "Staff Pick",
@@ -156,7 +156,7 @@ const products = [
     price: 379_000,
     description:
       "Performance ski boots with a 120 flex index, GripWalk soles, and a fully customizable thermo-formable liner. Micro-adjustable buckles let you dial in the fit on the fly.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/stella-noctis-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 8, L: 10, XL: 3 },
     colorLabel: "Black / Carbon",
@@ -172,7 +172,7 @@ const products = [
     price: 79_000,
     description:
       "Lightweight 7075 aluminum poles with a contoured cork grip and adjustable strap. The tapered tip penetrates firm snow easily. Sold as a pair.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/stella-noctis-thermal-1.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 15, S: 12, M: 20, L: 15, XL: 10 },
     colorLabel: "Black / Silver / Red",
@@ -189,7 +189,7 @@ const products = [
     price: 189_000,
     description:
       "Photochromic lenses that adapt from CAT 1 to CAT 3 coverage, so you never have to swap lenses from dawn to dusk. Anti-fog coating and a comfortable triple-layer face foam.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/ashley-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 5, M: 14, L: 12, XL: 6 },
     badge: "New",
@@ -206,7 +206,7 @@ const products = [
     price: 229_000,
     description:
       "In-mold construction with MIPS protection system reduces rotational forces on impact. 14 adjustable vents, a Fidlock magnetic buckle, and a removable ear pad design.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/asuka-thermal.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 10, L: 10, XL: 5 },
     colorLabel: "Matte Black / White / Grey",
@@ -222,7 +222,7 @@ const products = [
     price: 49_000,
     description:
       "Interchangeable lens kit for the Orbit frame. Includes a CAT 0 clear lens for night riding and a CAT 4 mirror lens for extreme sun. Microfiber carry pouch included.",
-    images: ["/images/products/winter/product.webp"],
+    images: ["/images/products/rem-boxy-tshirt.webp"],
     sizes: ["M", "L", "XL"],
     stock: { XS: 20, S: 15, M: 25, L: 20, XL: 10 },
     badge: "Sale",
@@ -334,7 +334,7 @@ async function main() {
     const amount = product.price * qty;
 
     const status = pickStatus();
-    const createdAt = hoursAgo(randomInt(1, 720)); // 1h to 30d ago
+    const createdAt = hoursAgo(randomInt(1, 720));
     const paidAt = status === "PAID" ? new Date(createdAt.getTime() + randomInt(5, 120) * 60000) : null;
     const expiredAt = status === "EXPIRED" ? new Date(createdAt.getTime() + 24 * 3600 * 1000) : null;
     const cancelledAt = status === "CANCELLED" ? new Date(createdAt.getTime() + randomInt(5, 60) * 60000) : null;

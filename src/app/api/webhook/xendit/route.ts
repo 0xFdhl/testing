@@ -2,17 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   getOrderByExternalId,
-  updateOrderByExternalId,
 } from "@/lib/orders";
+import { transitionOrderStatus } from "@/lib/orders";
 import {
   isPaidStatus,
   isXenditTestMode,
   verifyWebhookToken,
   type XenditWebhookPayload,
 } from "@/lib/xendit";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
   if (!verifyWebhookToken(req)) {
+    logger.warn("webhook.xendit signature invalid", {
+      hasToken: req.headers.has("x-callback-token"),
+    });
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -22,6 +26,7 @@ export async function POST(req: Request) {
     rawBody = await req.text();
     payload = JSON.parse(rawBody) as XenditWebhookPayload;
   } catch {
+    logger.warn("webhook.xendit invalid json", {});
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -62,15 +67,9 @@ export async function POST(req: Request) {
 
   try {
     if (isPaidStatus(status)) {
-      await updateOrderByExternalId(externalId, {
-        status: "PAID",
-        paidAt: new Date(),
-      });
+      await transitionOrderStatus(externalId, "PENDING", "PAID", { paidAt: new Date() });
     } else if (status === "EXPIRED") {
-      await updateOrderByExternalId(externalId, {
-        status: "EXPIRED",
-        expiredAt: new Date(),
-      });
+      await transitionOrderStatus(externalId, "PENDING", "EXPIRED", { expiredAt: new Date() });
     }
 
     await prisma.webhookEvent.update({
@@ -82,7 +81,8 @@ export async function POST(req: Request) {
       received: true,
       mode: isXenditTestMode() ? "test" : "live",
     });
-  } catch {
+  } catch (err) {
+    logger.error("webhook.xendit processing failed", { eventId, externalId, err: String(err) });
     await prisma.webhookEvent.update({
       where: { eventId },
       data: { status: "failed", processedAt: new Date() },

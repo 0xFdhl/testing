@@ -1,4 +1,4 @@
-import { isPublicXenditTestMode } from "@/lib/xendit";
+import { isPublicXenditTestMode } from "@/lib/xendit/public";
 
 export function XenditTestBanner() {
   if (!isPublicXenditTestMode()) return null;

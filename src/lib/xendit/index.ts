@@ -4,7 +4,6 @@ export {
   getXenditPublicKey,
   getXenditSecretKey,
   getXenditWebhookToken,
-  isPublicXenditTestMode,
   isXenditTestMode,
   type XenditCredentials,
   type XenditMode,

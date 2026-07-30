@@ -39,3 +39,31 @@ export function getClientIp(request: Request): string {
   if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
   return request.headers.get("x-real-ip") ?? "unknown";
 }
+
+/**
+ * CSRF: validasi Origin untuk API route non-server-action.
+ * Tolak request yang Origin/Referer-nya bukan dari host app sendiri.
+ * `sameSite` default Next.js cookie + cek ini menutup vektor CSRF standar.
+ */
+export function isSameOrigin(request: Request): boolean {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) return true;
+  let allowedHost: string;
+  try {
+    allowedHost = new URL(appUrl).host;
+  } catch {
+    return true;
+  }
+
+  for (const headerName of ["origin", "referer"]) {
+    const value = request.headers.get(headerName);
+    if (!value) continue;
+    try {
+      const host = new URL(value).host;
+      if (host !== allowedHost) return false;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}

@@ -1,8 +1,10 @@
 export type {
   CreateOrderInput,
   Order,
+  OrderCurrency,
   OrderLineItem,
   OrderStatus,
+  Provider,
   UpdateOrderInput,
 } from "./types";
 
@@ -11,4 +13,5 @@ export {
   getOrderByExternalId,
   updateOrderByExternalId,
   getOrdersByUserId,
+  transitionOrderStatus,
 } from "./store";

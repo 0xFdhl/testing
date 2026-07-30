@@ -1,3 +1,5 @@
+import "server-only";
+
 export type XenditMode = "test" | "live";
 
 let cachedMode: XenditMode | null = null;

@@ -10,11 +10,17 @@ export type OrderLineItem = {
   unitPrice: number;
 };
 
+export type Provider = "xendit" | "stripe";
+export type OrderCurrency = "IDR" | "USD";
+
 export type Order = {
   externalId: string;
   userId?: string;
   xenditInvoiceId?: string;
+  gatewayInvoiceId?: string;
   invoiceUrl?: string;
+  provider: Provider;
+  currency: OrderCurrency;
   status: OrderStatus;
   lineItems: OrderLineItem[];
   amount: number;
@@ -35,12 +41,17 @@ export type CreateOrderInput = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  provider?: Provider;
+  currency?: OrderCurrency;
 };
 
 export type UpdateOrderInput = {
   status?: OrderStatus;
   xenditInvoiceId?: string;
+  gatewayInvoiceId?: string;
   invoiceUrl?: string;
+  provider?: Provider;
+  currency?: OrderCurrency;
   paidAt?: Date;
   expiredAt?: Date;
   cancelledAt?: Date;

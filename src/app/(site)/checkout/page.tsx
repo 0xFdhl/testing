@@ -47,7 +47,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     await searchParams;
 
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     const p = new URLSearchParams();
     if (slug) p.set("slug", slug);
     if (sizeParam) p.set("size", sizeParam);
@@ -59,8 +59,8 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   const showPaymentFailed = failed === "1";
 
-  if (showPaymentFailed && orderId) {
-    await markOrderCancelledIfPending(orderId);
+  if (showPaymentFailed && orderId && session?.user?.id) {
+    await markOrderCancelledIfPending(orderId, session.user.id);
   }
 
   if (from === "cart") {

@@ -34,6 +34,7 @@ model User {
   name          String?
   image         String?
   emailVerified DateTime?
+  region        Region    @default(id)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
@@ -76,27 +77,31 @@ model VerificationToken {
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  externalId      String      @unique
-  userId          String?
-  xenditInvoiceId String?
-  invoiceUrl      String?
-  status          OrderStatus @default(PENDING)
-  lineItems       Json
-  amount          Int
-  customerName    String
-  customerEmail   String
-  customerPhone   String
-  createdAt       DateTime    @default(now())
-  paidAt          DateTime?
-  expiredAt       DateTime?
-  cancelledAt     DateTime?
-  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id               String          @id @default(cuid())
+  externalId       String          @unique
+  userId           String?
+  xenditInvoiceId  String?
+  gatewayInvoiceId String?
+  invoiceUrl       String?
+  provider         PaymentProvider @default(xendit)
+  currency         Currency        @default(IDR)
+  status           OrderStatus     @default(PENDING)
+  lineItems        Json
+  amount           Int
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  createdAt        DateTime        @default(now())
+  paidAt           DateTime?
+  expiredAt        DateTime?
+  cancelledAt      DateTime?
+  user             User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@index([xenditInvoiceId])
+  @@index([provider])
 }
 
 model WebhookEvent {
@@ -106,8 +111,10 @@ model WebhookEvent {
   status      String
   payload     Json?
   processedAt DateTime?
+  createdAt   DateTime  @default(now())
 
   @@index([status])
+  @@index([createdAt])
 }
 
 model AdminUser {
@@ -146,6 +153,21 @@ enum OrderStatus {
   PAID
   EXPIRED
   CANCELLED
+}
+
+enum Region {
+  id
+  intrl
+}
+
+enum Currency {
+  IDR
+  USD
+}
+
+enum PaymentProvider {
+  xendit
+  stripe
 }
 
 enum AdminRole {

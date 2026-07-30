@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatIdr } from "@/lib/format";
 import type { Order } from "@/lib/orders";
-import { isPublicXenditTestMode } from "@/lib/xendit";
+import { isPublicXenditTestMode } from "@/lib/xendit/public";
 import { cn } from "@/lib/utils";
 import { XenditTestBanner } from "./xendit-test-banner";
 

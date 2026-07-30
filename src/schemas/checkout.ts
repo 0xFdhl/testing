@@ -29,25 +29,29 @@ export const cartLineItemSchema = z.object({
     .max(10, "Maksimal 10 item per produk"),
 });
 
-export const cartCheckoutSchema = z.object({
-  items: z
-    .array(cartLineItemSchema)
-    .min(1, "Cart kosong")
-    .max(20, "Terlalu banyak item"),
-  ...customerFields,
-});
+export const cartCheckoutSchema = z
+  .object({
+    items: z
+      .array(cartLineItemSchema)
+      .min(1, "Cart kosong")
+      .max(20, "Terlalu banyak item"),
+    ...customerFields,
+  })
+  .strict();
 
 export type CartCheckoutInput = z.infer<typeof cartCheckoutSchema>;
 
-export const checkoutSchema = z.object({
-  productSlug: z.string().min(1, "Produk wajib dipilih"),
-  size: z.enum(displaySizes, { message: "Ukuran tidak valid" }),
-  quantity: z.coerce
-    .number()
-    .int("Jumlah harus bilangan bulat")
-    .min(1, "Minimal 1 item")
-    .max(10, "Maksimal 10 item per order"),
-  ...customerFields,
-});
+export const checkoutSchema = z
+  .object({
+    productSlug: z.string().min(1, "Produk wajib dipilih"),
+    size: z.enum(displaySizes, { message: "Ukuran tidak valid" }),
+    quantity: z.coerce
+      .number()
+      .int("Jumlah harus bilangan bulat")
+      .min(1, "Minimal 1 item")
+      .max(10, "Maksimal 10 item per order"),
+    ...customerFields,
+  })
+  .strict();
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;

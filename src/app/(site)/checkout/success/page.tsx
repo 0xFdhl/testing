@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PaymentStatus } from "@/components/checkout/payment-status";
 import { Navbar } from "@/components/layout/navbar";
+import { auth } from "@/lib/next-auth";
 import { getCheckoutOrder } from "@/actions/checkout";
 
 export const metadata: Metadata = {
@@ -15,6 +17,11 @@ type Props = {
 
 export default async function CheckoutSuccessPage({ searchParams }: Props) {
   const { order: externalId } = await searchParams;
+
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect(`/login?callbackUrl=${encodeURIComponent("/checkout/success")}`);
+  }
 
   if (!externalId) {
     return (
@@ -36,7 +43,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
     );
   }
 
-  const order = await getCheckoutOrder(externalId);
+  const order = await getCheckoutOrder(externalId, session.user.id);
 
   if (!order) {
     return (

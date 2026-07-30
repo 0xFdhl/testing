@@ -1,3 +1,5 @@
+import "server-only";
+
 export class XenditError extends Error {
   readonly statusCode?: number;
   readonly userMessage: string;

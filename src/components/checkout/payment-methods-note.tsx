@@ -1,4 +1,4 @@
-import { PAYMENT_METHOD_LABELS } from "@/lib/xendit";
+import { PAYMENT_METHOD_LABELS } from "@/lib/xendit/payment-methods";
 
 const DISPLAY_ORDER = Object.values(PAYMENT_METHOD_LABELS);
 

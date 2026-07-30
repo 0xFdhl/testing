@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { createPaymentSchema } from "@/schemas/payment";
-import { createInvoice, isXenditTestMode, toCheckoutErrorMessage } from "@/lib/xendit";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { isXenditTestMode } from "@/lib/xendit";
+import { isStripeTestMode } from "@/lib/stripe";
+import { toCheckoutErrorMessage } from "@/lib/payments/errors";
+import { checkRateLimit, getClientIp, isSameOrigin } from "@/lib/rate-limit";
 import { auth } from "@/lib/next-auth";
+import { logger } from "@/lib/logger";
+import { resolveGateway } from "@/lib/payments/router";
+import {
+  createCheckout,
+  calculateAmountMinor,
+  resolveCurrency,
+} from "@/lib/payments";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -10,13 +19,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ip = getClientIp(req);
-  const rateLimit = checkRateLimit(`payment:${ip}`, 10, 60_000);
+  if (!isSameOrigin(req)) {
+    return NextResponse.json({ error: "Forbidden: invalid origin" }, { status: 403 });
+  }
 
-  if (!rateLimit.allowed) {
+  const userId = session.user.id;
+  const ip = getClientIp(req);
+
+  const userLimit = checkRateLimit(`payment:user:${userId}`, 10, 60_000);
+  if (!userLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests. Try again later." },
-      { status: 429 },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(userLimit.retryAfterMs / 1000)) },
+      },
+    );
+  }
+
+  const ipLimit = checkRateLimit(`payment:ip:${ip}`, 30, 60_000);
+  if (!ipLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests from this IP. Try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(ipLimit.retryAfterMs / 1000)) },
+      },
     );
   }
 
@@ -36,33 +64,40 @@ export async function POST(req: Request) {
   }
 
   const data = parsed.data;
+  const region: "id" | "intrl" = (session.user.region as "id" | "intrl" | undefined) ?? "id";
+  const provider = resolveGateway(region);
+  const currency = resolveCurrency(provider);
+  const amountMinor = calculateAmountMinor(provider, data.amount);
 
   try {
-    const invoice = await createInvoice({
+    const session = await createCheckout(provider, {
       externalId: data.externalId,
-      amount: data.amount,
-      payerEmail: data.payerEmail,
+      amountMinor,
+      currency,
       description: data.description,
-      customer: data.customer,
-      items: data.items,
-      successRedirectUrl: data.successRedirectUrl,
-      failureRedirectUrl: data.failureRedirectUrl,
-      invoiceDurationSeconds: data.invoiceDurationSeconds,
+      customerEmail: data.payerEmail,
+      customerName: data.customer?.given_names ?? "",
+      customerPhone: data.customer?.mobile_number ?? "",
+      items: data.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        unitPriceMinor: item.price,
+      })),
+      successUrl: data.successRedirectUrl,
+      cancelUrl: data.failureRedirectUrl,
     });
 
     return NextResponse.json({
       ok: true,
-      mode: isXenditTestMode() ? "test" : "live",
-      invoice: {
-        id: invoice.id,
-        external_id: invoice.external_id,
-        status: invoice.status,
-        amount: invoice.amount,
-        invoice_url: invoice.invoice_url,
-        expiry_date: invoice.expiry_date,
+      mode: provider === "stripe" ? (isStripeTestMode() ? "test" : "live") : (isXenditTestMode() ? "test" : "live"),
+      session: {
+        id: session.sessionId,
+        url: session.url,
+        provider: session.provider,
       },
     });
   } catch (err) {
+    logger.error("payment.create failed", { userId, provider, err: String(err) });
     return NextResponse.json(
       { ok: false, error: toCheckoutErrorMessage(err) },
       { status: 502 },

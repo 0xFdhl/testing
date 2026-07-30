@@ -65,9 +65,9 @@ export const exploreLinks: NavLink[] = [
 ];
 
 export const featuredNavProductSlugs = [
-  "yourproduct-1",
-  "yourproduct-2",
-  "yourproduct-3",
+  "alpha-jacket",
+  "sigma-down-parka",
+  "phantom-snowboard",
 ] as const;
 
 export { isValidShopFilterCategory as isValidShopCategory } from "@/lib/products";
