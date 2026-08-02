@@ -17,11 +17,11 @@ const logoScript = Pinyon_Script({
 
 export const metadata: Metadata = {
   title: {
-    default: ".bbr — Winter Sport Gear",
-    template: "%s | .bbr",
+    default: "varcasvi_",
+    template: "%s | varcasvi_",
   },
   description:
-    "be better. Editorial winter sport gear — helmets, jackets, goggles, and more from .bbr.",
+    "be better. Editorial — helmets, jackets, goggles, and more from varcasvi_.",
 };
 
 export const viewport: Viewport = {

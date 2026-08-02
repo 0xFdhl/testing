@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 
 import type { Product } from "@/lib/products";
 import { NewArrivalCard } from "@/components/home/new-arrival-card";
@@ -12,6 +13,7 @@ type NewArrivalsProps = {
 export function NewArrivals({ products }: NewArrivalsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   const updateProgress = useCallback(() => {
     const el = scrollRef.current;
@@ -50,8 +52,12 @@ export function NewArrivals({ products }: NewArrivalsProps) {
       <div className="mx-auto mt-8 w-full max-w-[120px] lg:mx-0 lg:mt-10 lg:max-w-[200px]">
         <div className="h-px w-full bg-neutral-200">
           <div
-            className="h-px bg-black transition-[width] duration-150 ease-out"
-            style={{ width: `${Math.max(20, progress * 100)}%` }}
+            className="h-px w-full origin-left bg-black"
+            style={{
+              transform: `scaleX(${Math.max(0.2, progress)})`,
+              transition: prefersReducedMotion ? "none" : "transform 150ms ease-out",
+              willChange: "transform",
+            }}
           />
         </div>
       </div>

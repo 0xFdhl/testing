@@ -19,7 +19,6 @@ import {
 } from "@/config/navigation";
 import { useCart } from "@/components/cart/cart-provider";
 import { AnimatedMenuButton } from "@/components/layout/animated-menu-button";
-import { Logo } from "@/components/layout/logo";
 import {
   NavCartIcon,
   NavSearchIcon,
@@ -28,6 +27,11 @@ import { NavSearch } from "@/components/layout/nav-search";
 import { MobileMenuDrawer } from "@/components/layout/mobile-menu-drawer";
 import { UserMenu } from "@/components/layout/user-menu";
 import { cn } from "@/lib/utils";
+import {
+  EASE_RISE,
+  EASE_SETTLE,
+  NAVBAR_SCROLL_SPRING,
+} from "@/lib/motion";
 
 const NAVBAR_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -41,7 +45,7 @@ const HOVER_BG_TRANSITION = {
 const COLOR_TRANSITION_CLASS =
   "transition-colors duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]";
 
-const SCROLL_SPRING = { stiffness: 110, damping: 28, mass: 0.75 };
+const SCROLL_SPRING = NAVBAR_SCROLL_SPRING;
 
 export type { NavLinkItem } from "@/config/navigation";
 
@@ -128,6 +132,11 @@ function NavbarActionButton({
   );
 }
 
+/**
+ * Navbar wordmark — matches OpeningOverlay's "varcasvi_" text exactly
+ * (same font, same final tracking of -0.14em) so the opening sequence's
+ * crossfade into the navbar has zero visual jump.
+ */
 function AnimatedNavbarLogo({
   isLight,
   className,
@@ -137,10 +146,13 @@ function AnimatedNavbarLogo({
 }) {
   const prefersReducedMotion = useReducedMotion();
 
+  const textClass =
+    "block select-none whitespace-nowrap font-sans text-lg font-bold leading-none lowercase tracking-[-0.14em] sm:text-xl";
+
   return (
-    <div className={cn("relative shrink-0", className)}>
-      <motion.div
-        className="absolute inset-0"
+    <span className={cn("relative shrink-0 select-none", className)}>
+      <motion.span
+        className={cn(textClass, "absolute inset-0 text-white")}
         animate={{ opacity: isLight ? 0 : 1 }}
         transition={
           prefersReducedMotion
@@ -148,9 +160,10 @@ function AnimatedNavbarLogo({
             : { duration: 0.45, ease: NAVBAR_EASE }
         }
       >
-        <Logo variant="light" size="compact" />
-      </motion.div>
-      <motion.div
+        varcasvi_
+      </motion.span>
+      <motion.span
+        className={cn(textClass, "relative text-black")}
         animate={{ opacity: isLight ? 1 : 0 }}
         transition={
           prefersReducedMotion
@@ -158,9 +171,9 @@ function AnimatedNavbarLogo({
             : { duration: 0.45, ease: NAVBAR_EASE }
         }
       >
-        <Logo variant="dark" size="compact" />
-      </motion.div>
-    </div>
+        varcasvi_
+      </motion.span>
+    </span>
   );
 }
 
@@ -189,7 +202,12 @@ export function Navbar({
   const { scrollY } = useScroll();
   const smoothScrollY = useSpring(scrollY, SCROLL_SPRING);
 
-  const scrollBackdropOpacity = useTransform(smoothScrollY, [0, 32, 112], [0, 0.55, 1]);
+  const scrollBackdropOpacity = useTransform(
+    smoothScrollY,
+    [0, 32, 112],
+    [0, 0.55, 1],
+    { ease: [EASE_RISE, EASE_SETTLE] },
+  );
 
   const pastHeroOpacity = useTransform(smoothScrollY, (y) => {
     if (pathnameRef.current !== "/") return 0;
@@ -197,7 +215,8 @@ export function Navbar({
     const end = heroHeight * 0.94;
     if (y <= start) return 0;
     if (y >= end) return 1;
-    return (y - start) / (end - start);
+    const t = (y - start) / (end - start);
+    return EASE_RISE(t);
   });
 
   const creamOpacity = useTransform(
@@ -210,16 +229,28 @@ export function Navbar({
     ([backdrop, pastHero]) => (backdrop as number) * (pastHero as number),
   );
 
-  const shadowOpacity = useTransform(smoothScrollY, [0, 80, 160], [0, 0.35, 0.65]);
-  const headerShadow = useTransform(
-    shadowOpacity,
-    (v) => `0 10px 32px -8px rgba(0,0,0,${v * 0.14})`,
+  const shadowOpacity = useTransform(
+    smoothScrollY,
+    [0, 80, 160],
+    [0, 0.35, 0.65],
+    { ease: [EASE_RISE, EASE_SETTLE] },
   );
 
-  useMotionValueEvent(smoothScrollY, "change", (y) => {
-    setScrolled(y > 14);
+  /** Continuous 0→1 blend replacing hard `scrollY > 14` threshold */
+  const scrollEngaged = useTransform(
+    smoothScrollY,
+    [0, 14, 36],
+    [0, 0, 1],
+    { ease: EASE_RISE },
+  );
+
+  useMotionValueEvent(scrollEngaged, "change", (v) => {
+    setScrolled(v > 0.5);
+  });
+
+  useMotionValueEvent(pastHeroOpacity, "change", (v) => {
     if (pathnameRef.current === "/" && isHeroLayout) {
-      setPastHero(y > heroHeight * 0.75);
+      setPastHero(v > 0.5);
     } else {
       setPastHero(false);
     }
@@ -257,7 +288,12 @@ export function Navbar({
       }
       setScrolled(window.scrollY > 14);
       if (isHeroLayout && pathname === "/") {
-        setPastHero(window.scrollY > window.innerHeight * 0.75);
+        const start = window.innerHeight * 0.82;
+        const end = window.innerHeight * 0.94;
+        const y = window.scrollY;
+        const blend =
+          y <= start ? 0 : y >= end ? 1 : (y - start) / (end - start);
+        setPastHero(blend > 0.5);
       }
     });
     return () => cancelAnimationFrame(id);
@@ -309,12 +345,14 @@ export function Navbar({
             "relative h-[var(--navbar-height)] md:h-[var(--navbar-height-md)]",
             !isTransparent && "border-b border-white/5 bg-[#0A0A0A]/90 backdrop-blur-md",
           )}
-          style={
-            isTransparent && !prefersReducedMotion
-              ? { boxShadow: headerShadow }
-              : undefined
-          }
         >
+          {isTransparent && !prefersReducedMotion && (
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 z-[1] shadow-[0_10px_32px_-8px_rgba(0,0,0,0.09)]"
+              style={{ opacity: shadowOpacity, willChange: "opacity" }}
+            />
+          )}
           {isTransparent && (
             <motion.div
               aria-hidden

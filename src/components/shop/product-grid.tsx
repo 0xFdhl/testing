@@ -66,7 +66,7 @@ export function ProductGrid({
               : "No pieces in this category yet. Try another filter."}
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 md:grid-cols-5 md:gap-3 lg:grid-cols-6 lg:gap-4">
+          <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-4 sm:gap-x-3 sm:gap-y-8 md:grid-cols-5 md:gap-x-3 lg:grid-cols-6 lg:gap-x-4">
             {filtered.map((product, i) => (
               <ProductCard
                 key={product.id}

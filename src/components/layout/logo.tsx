@@ -16,7 +16,7 @@ export function Logo({ variant = "light", className, size = "default" }: LogoPro
         "relative block shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current",
         className,
       )}
-      aria-label=".bbr home"
+      aria-label="varcasvi_ home"
     >
       <span
         className={cn(
@@ -27,7 +27,7 @@ export function Logo({ variant = "light", className, size = "default" }: LogoPro
           variant === "light" ? "text-white" : "text-black",
         )}
       >
-        .bbr
+        varcasvi_
       </span>
     </Link>
   );

@@ -36,7 +36,7 @@ export default async function AdminLoginPage({
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
-            .bbr Admin
+            varcasvi_ Admin
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-white">Sign in</h1>
           <p className="mt-1 text-sm text-zinc-400">

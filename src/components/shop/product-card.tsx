@@ -32,7 +32,7 @@ export function ProductCard({
         <div
           className={
             isCatalog
-              ? "relative aspect-[4/5] overflow-hidden rounded-xl bg-neutral-200 transition-opacity group-hover:opacity-90"
+              ? "relative aspect-[3/4] overflow-hidden rounded-md bg-transparent transition-opacity group-hover:opacity-90 sm:rounded-lg"
               : "relative aspect-[3/4] overflow-hidden bg-white transition-opacity group-hover:opacity-90"
           }
         >
@@ -42,26 +42,22 @@ export function ProductCard({
             fill
             className={
               isCatalog
-                ? "object-cover object-center grayscale contrast-110 transition-transform duration-500 group-hover:scale-[1.04]"
+                ? `object-cover ${product.imagePosition ?? "object-center"} saturate-0 contrast-[1.08] brightness-[0.97] transition-transform duration-500 group-hover:scale-[1.02]`
                 : "object-contain object-center p-2 transition-transform duration-500 group-hover:scale-[1.02]"
             }
             sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 12vw"
           />
-          {isCatalog && (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <p className="text-lg font-bold uppercase leading-[0.95] tracking-tight text-white sm:text-xl">
-                  New
-                </p>
-                <p className="text-lg font-bold uppercase leading-[0.95] tracking-tight text-white sm:text-xl">
-                  {product.name}
-                </p>
-              </div>
-            </>
-          )}
         </div>
-        {!isCatalog && (
+        {isCatalog ? (
+          <div className="mt-3 space-y-1.5 sm:mt-4">
+            <p className="text-[11px] font-semibold tracking-[0.02em] text-black sm:text-xs">
+              {product.name}
+            </p>
+            <p className="text-[clamp(11px,1vw+8px,12px)] text-neutral-400">
+              {formatIdr(product.price)}
+            </p>
+          </div>
+        ) : (
           <div className="mt-1.5 space-y-0">
             <p className="text-[clamp(11px,1vw+8px,12px)] font-bold tracking-[0.12em] text-black uppercase">
               {product.name}

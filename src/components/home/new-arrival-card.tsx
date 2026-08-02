@@ -16,7 +16,7 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
         className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={product.name}
       >
-        <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-neutral-100 sm:rounded-lg">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-transparent sm:rounded-lg">
           <Image
             src={product.image}
             alt={product.name}
@@ -33,16 +33,6 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
           <p className="text-[clamp(11px,1vw+8px,12px)] text-neutral-400">
             {formatIdr(product.price)}
           </p>
-          <ul className="flex items-center gap-1.5 pt-0.5" aria-label="Color options">
-            {(product.colors ?? []).map((color) => (
-              <li key={color.id}>
-                <span
-                  className={`block size-2.5 rounded-[2px] sm:size-3 ${color.className}`}
-                  title={color.label}
-                />
-              </li>
-            ))}
-          </ul>
         </div>
       </Link>
     </article>

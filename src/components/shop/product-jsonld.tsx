@@ -14,7 +14,7 @@ export function ProductJsonLd({ product }: Props) {
     sku: product.slug,
     brand: {
       "@type": "Brand",
-      name: ".bbr",
+      name: "varcasvi_",
     },
     offers: {
       "@type": "Offer",

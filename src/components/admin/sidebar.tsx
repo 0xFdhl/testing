@@ -93,7 +93,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           Admin
         </p>
-        <p className="mt-1 text-lg font-semibold text-white">.bbr Dashboard</p>
+        <p className="mt-1 text-lg font-semibold text-white">varcasvi_ Dashboard</p>
       </div>
 
       <nav className="flex-1 space-y-4 overflow-y-auto p-4">

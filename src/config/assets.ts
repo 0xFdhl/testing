@@ -2,25 +2,25 @@ export const heroSlides = [
   {
     id: "slide-jacket",
     src: "/images/products/hoodie-zipp-diagonal.webp",
-    alt: "Alpha Insulated Jacket — .bbr",
+    alt: "Alpha Insulated Jacket — varcasvi_",
     href: "/shop/alpha-jacket",
   },
   {
     id: "slide-parka",
     src: "/images/products/stella-noctis-thermal.webp",
-    alt: "Sigma Down Parka — .bbr",
+    alt: "Sigma Down Parka — varcasvi_",
     href: "/shop/sigma-down-parka",
   },
   {
     id: "slide-snowboard",
     src: "/images/products/ashley-thermal.webp",
-    alt: "Phantom Snowboard — .bbr",
+    alt: "Phantom Snowboard — varcasvi_",
     href: "/shop/phantom-snowboard",
   },
   {
     id: "slide-goggles",
     src: "/images/products/asuka-thermal.webp",
-    alt: "Orbit Photochromic Goggles — .bbr",
+    alt: "Orbit Photochromic Goggles — varcasvi_",
     href: "/shop/orbit-goggles",
   },
 ] as const;
