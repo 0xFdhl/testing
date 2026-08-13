@@ -26,12 +26,17 @@ import {
 import { NavSearch } from "@/components/layout/nav-search";
 import { MobileMenuDrawer } from "@/components/layout/mobile-menu-drawer";
 import { UserMenu } from "@/components/layout/user-menu";
+import { useOpening } from "@/components/home/opening-provider";
 import { cn } from "@/lib/utils";
 import {
   EASE_RISE,
   EASE_SETTLE,
   NAVBAR_SCROLL_SPRING,
 } from "@/lib/motion";
+import {
+  OPENING_LOGO_TEXT,
+  OPENING_TRACKING_FINAL,
+} from "@/lib/opening-constants";
 
 const NAVBAR_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -133,9 +138,13 @@ function NavbarActionButton({
 }
 
 /**
- * Navbar wordmark — matches OpeningOverlay's "varcasvi_" text exactly
- * (same font, same final tracking of -0.14em) so the opening sequence's
- * crossfade into the navbar has zero visual jump.
+ * Navbar wordmark — target pendaratan morph OpeningOverlay.
+ * Font & tracking memakai konstanta bersama (src/lib/opening-constants.ts)
+ * supaya handoff logo pixel-perfect tanpa visual jump.
+ *
+ * Saat intro aktif, wordmark digate oleh navbarLogoOpacity (muncul tepat saat
+ * logo overlay "mendarat" di posisi ini). Elemen sizer didaftarkan via
+ * registerTarget agar hook bisa mengukur posisi & font-size-nya.
  */
 function AnimatedNavbarLogo({
   isLight,
@@ -145,35 +154,46 @@ function AnimatedNavbarLogo({
   className?: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
+  const opening = useOpening();
 
   const textClass =
-    "block select-none whitespace-nowrap font-sans text-lg font-bold leading-none lowercase tracking-[-0.14em] sm:text-xl";
+    "block select-none whitespace-nowrap font-sans text-lg font-bold leading-none lowercase sm:text-xl";
 
   return (
-    <span className={cn("relative shrink-0 select-none", className)}>
-      <motion.span
-        className={cn(textClass, "absolute inset-0 text-white")}
-        animate={{ opacity: isLight ? 0 : 1 }}
-        transition={
-          prefersReducedMotion
-            ? { duration: 0 }
-            : { duration: 0.45, ease: NAVBAR_EASE }
-        }
-      >
-        varcasvi_
-      </motion.span>
-      <motion.span
-        className={cn(textClass, "relative text-black")}
-        animate={{ opacity: isLight ? 1 : 0 }}
-        transition={
-          prefersReducedMotion
-            ? { duration: 0 }
-            : { duration: 0.45, ease: NAVBAR_EASE }
-        }
-      >
-        varcasvi_
-      </motion.span>
-    </span>
+    <motion.span
+      className={cn("relative shrink-0 select-none", className)}
+      style={{
+        letterSpacing: OPENING_TRACKING_FINAL,
+        ...(opening ? { opacity: opening.navbarLogoOpacity } : {}),
+      }}
+    >
+      {/* Sizer: pembawa font-size + ref target pengukuran morph */}
+      <span ref={opening?.registerTarget} className={cn(textClass, "relative")}>
+        <motion.span
+          aria-hidden
+          className={cn(textClass, "absolute inset-0 text-white")}
+          animate={{ opacity: isLight ? 0 : 1 }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 }
+              : { duration: 0.45, ease: NAVBAR_EASE }
+          }
+        >
+          {OPENING_LOGO_TEXT}
+        </motion.span>
+        <motion.span
+          className={cn(textClass, "relative text-black")}
+          animate={{ opacity: isLight ? 1 : 0 }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 }
+              : { duration: 0.45, ease: NAVBAR_EASE }
+          }
+        >
+          {OPENING_LOGO_TEXT}
+        </motion.span>
+      </span>
+    </motion.span>
   );
 }
 

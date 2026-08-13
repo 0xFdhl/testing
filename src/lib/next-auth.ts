@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  debug: process.env.NODE_ENV !== "production",
+  debug: false,
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
@@ -19,7 +19,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async jwt({ token }) {
-      if (token.sub) {
+      if (token.sub && token.region === undefined) {
         const user = await prisma.user.findUnique({
           where: { id: token.sub },
           select: { region: true },
@@ -37,8 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   logger: {
-  error: (err) => console.error("[auth][error]", err),
-  debug: (msg, meta) => console.log("[auth][debug]", msg, meta),
-  warn: (msg) => console.warn("[auth][warn]", msg),
-},
+    error: (err) => console.error("[auth][error]", err),
+    warn: (msg) => console.warn("[auth][warn]", msg),
+  },
 });

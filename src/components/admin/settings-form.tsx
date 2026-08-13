@@ -13,6 +13,8 @@ type SettingsFormProps = {
   secretKeyMasked: string;
   webhookTokenConfigured: boolean;
   securityHeaders: { name: string; ok: boolean }[];
+  adminsCanEditPhotos: boolean;
+  canManagePhotoToggle: boolean;
 };
 
 export function SettingsForm({
@@ -22,6 +24,8 @@ export function SettingsForm({
   secretKeyMasked,
   webhookTokenConfigured,
   securityHeaders,
+  adminsCanEditPhotos,
+  canManagePhotoToggle,
 }: SettingsFormProps) {
   const [state, formAction, pending] = useActionState<
     ActionResult,
@@ -125,6 +129,29 @@ export function SettingsForm({
               </button>
             </div>
           </div>
+        </section>
+
+        <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
+          <h2 className="text-lg font-medium text-white">Permissions</h2>
+          <label className="flex items-center justify-between gap-4">
+            <div>
+              <span className="text-sm text-zinc-300">
+                Allow admins to edit product photos
+              </span>
+              <p className="text-xs text-zinc-500">
+                When off, only SUPERADMIN can edit photos.
+                {!canManagePhotoToggle && " (SUPERADMIN only)"}
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              name="adminsCanEditPhotos"
+              value="on"
+              defaultChecked={adminsCanEditPhotos}
+              disabled={!canManagePhotoToggle}
+              className="h-5 w-5 rounded border-zinc-700 bg-zinc-950 accent-white disabled:opacity-50"
+            />
+          </label>
         </section>
 
         <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">

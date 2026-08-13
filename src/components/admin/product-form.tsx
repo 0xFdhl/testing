@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { slugify } from "@/lib/format-admin";
 import {
   createProductAction,
   updateProductAction,
+  uploadProductImageAction,
   type ActionResult,
 } from "@/lib/admin-actions";
 import { displaySizes, productCategories } from "@/schemas/admin";
@@ -12,6 +13,7 @@ import type { Product } from "@/generated/prisma/client";
 
 type ProductFormProps = {
   product?: Product;
+  canEditPhotos?: boolean;
 };
 
 const initialState: ActionResult = { success: false };
@@ -23,7 +25,7 @@ function getStockValue(stock: unknown, size: string): number {
   return 0;
 }
 
-export function ProductForm({ product }: ProductFormProps) {
+export function ProductForm({ product, canEditPhotos = true }: ProductFormProps) {
   const isEdit = Boolean(product);
   const boundAction = isEdit
     ? updateProductAction.bind(null, product!.id)
@@ -43,8 +45,36 @@ export function ProductForm({ product }: ProductFormProps) {
   const [returnsInfo, setReturnsInfo] = useState<string[]>(
     product?.returnsInfo?.length ? product.returnsInfo : [""],
   );
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const derivedSlug = autoSlug ? slugify(name) : slug;
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !product) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await uploadProductImageAction(product.id, fd);
+      if (!res.success || !res.url) {
+        setUploadError(res.error ?? "Upload gagal.");
+      } else {
+        setImages((prev) => {
+          const cleaned = prev.filter(Boolean);
+          return [...cleaned, res.url!];
+        });
+      }
+    } catch {
+      setUploadError("Upload gagal. Coba lagi.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   function updateListItem(
     list: string[],
@@ -163,14 +193,23 @@ export function ProductForm({ product }: ProductFormProps) {
 
       <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium text-white">Images</h2>
-          <button
-            type="button"
-            onClick={() => setImages([...images, ""])}
-            className="rounded-sm text-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-          >
-            + Add URL
-          </button>
+          <div>
+            <h2 className="text-lg font-medium text-white">Images</h2>
+            {!canEditPhotos && (
+              <p className="mt-0.5 text-xs text-amber-400">
+                Only SUPERADMIN can edit photos.
+              </p>
+            )}
+          </div>
+          {canEditPhotos && (
+            <button
+              type="button"
+              onClick={() => setImages([...images, ""])}
+              className="rounded-sm text-sm text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+            >
+              + Add URL
+            </button>
+          )}
         </div>
         {images.map((url, i) => (
           <div key={i} className="flex gap-2">
@@ -178,10 +217,11 @@ export function ProductForm({ product }: ProductFormProps) {
               name="images"
               value={url}
               onChange={(e) => updateListItem(images, setImages, i, e.target.value)}
-              placeholder="https://..."
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+              placeholder="/images/products/x.webp atau https://..."
+              disabled={!canEditPhotos}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-zinc-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:opacity-60"
             />
-            {images.length > 1 && (
+            {canEditPhotos && images.length > 1 && (
               <button
                 type="button"
                 aria-label={`Remove image URL ${i + 1}`}
@@ -193,6 +233,30 @@ export function ProductForm({ product }: ProductFormProps) {
             )}
           </div>
         ))}
+        {isEdit && canEditPhotos && (
+          <div className="rounded-lg border border-dashed border-zinc-700 bg-zinc-950/40 p-4">
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/webp,image/jpeg,image/png,image/avif"
+                onChange={handleUpload}
+                disabled={uploading}
+                className="block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:opacity-50"
+              />
+              {uploading && (
+                <span className="text-xs text-zinc-400">Uploading…</span>
+              )}
+            </div>
+            <p className="mt-2 text-xs text-zinc-500">
+              Upload langsung ke Supabase Storage. Maks 2 MB (webp/jpg/png/avif).
+              URL otomatis ditambahkan ke daftar di atas.
+            </p>
+            {uploadError && (
+              <p className="mt-2 text-xs text-red-400">{uploadError}</p>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">

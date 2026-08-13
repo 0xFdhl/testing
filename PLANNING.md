@@ -1,4 +1,4 @@
-# PLANING — Dual Payment Gateway (Xendit + Stripe)
+# PLANNING — Dual Payment Gateway (Xendit + Stripe)
 
 Perencanaan implementasi penambahan Stripe + routing regional. Bertujuan: user region `id` → Xendit (IDR), user region `intrl` → Stripe (USD), tanpa breaking integrasi Xendit yang sudah ada.
 

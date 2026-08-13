@@ -80,6 +80,24 @@ describe("productFormSchema", () => {
     ).toBe(false);
   });
 
+  it("accepts a site-relative image path", () => {
+    expect(
+      productFormSchema.safeParse({
+        ...validBase,
+        images: ["/images/products/x.webp"],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects non-http url scheme", () => {
+    expect(
+      productFormSchema.safeParse({
+        ...validBase,
+        images: ["ftp://example.com/x.webp"],
+      }).success,
+    ).toBe(false);
+  });
+
   it("rejects negative stock", () => {
     expect(
       productFormSchema.safeParse({ ...validBase, stock: { M: -1 } }).success,
@@ -125,6 +143,7 @@ describe("settingsSchema", () => {
       settingsSchema.safeParse({
         xenditMode: "test",
         appUrl: "https://example.com",
+        adminsCanEditPhotos: "on",
       }).success,
     ).toBe(true);
   });
@@ -134,14 +153,28 @@ describe("settingsSchema", () => {
       settingsSchema.safeParse({
         xenditMode: "sandbox",
         appUrl: "https://example.com",
+        adminsCanEditPhotos: "on",
       }).success,
     ).toBe(false);
   });
 
   it("rejects invalid url", () => {
     expect(
-      settingsSchema.safeParse({ xenditMode: "live", appUrl: "not-a-url" })
-        .success,
+      settingsSchema.safeParse({
+        xenditMode: "live",
+        appUrl: "not-a-url",
+        adminsCanEditPhotos: "off",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects invalid photo toggle value", () => {
+    expect(
+      settingsSchema.safeParse({
+        xenditMode: "live",
+        appUrl: "https://example.com",
+        adminsCanEditPhotos: "maybe",
+      }).success,
     ).toBe(false);
   });
 });

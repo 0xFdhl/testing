@@ -1,6 +1,6 @@
 # SECURITY — Threat Model & Mitigasi (yourbrand E-Commerce)
 
-> Dokumen ini melengkapi [`README.md`](./README.md) (arsitektur) dan [`PLANING.md`](./PLANING.md) (rencana implementasi Stripe).
+> Dokumen ini melengkapi [`README.md`](./README.md) (arsitektur) dan [`PLANNING.md`](./PLANNING.md) (rencana implementasi Stripe).
 > Fokus: **skenario serangan konkret** yang realistis untuk e-commerce dengan dual payment gateway, dan mitigasi teknisnya.
 > Update dokumen ini setiap ada insiden, pentest, atau perubahan arsitektur.
 
@@ -38,7 +38,7 @@ Patch yang Sudah Diapply (forked hardening ini):
 
 Item Masih Perlu Tindak Lanjut:
 
-- **§2.6 JWT refresh after `setRegion()`** — N/A (region belum diimplement, N/A (region belum diimplement, lihat PLANING.md).
+- **§2.6 JWT refresh after `setRegion()`** — N/A (region belum diimplement, N/A (region belum diimplement, lihat PLANNING.md).
 - **Stripe webhook + timestamp tolerance** — N/A sebelum Stripe diimplement.
 - **WebhookEvent retention cron scheduling** — function tersedia (`purgeOldWebhookEvents`), perlu daftarkan ke Vercel Cron / external scheduler (lihat `lib/webhook-retention.ts` docs).
 - **Multi-instance idempotency** — impl in-memory (sama pola `rate-limit.ts`); untuk multi-instance production, ganti backing store ke Redis/DB (lihat `lib/idempotency.ts` docs & SECURITY.md §2.7).
@@ -77,7 +77,7 @@ Item Masih Perlu Tindak Lanjut:
 **Skenario:** Attacker kirim POST langsung ke `/api/webhook/xendit` atau `/api/webhook/stripe` dengan payload `status: PAID` untuk order miliknya yang belum dibayar.
 
 **Mitigasi:**
-- Signature verification **wajib** dan **timing-safe** (`crypto.timingSafeEqual`) — sudah didesain di README/PLANING, pastikan tidak ada early-return sebelum verifikasi (hindari bug "verify setelah proses").
+- Signature verification **wajib** dan **timing-safe** (`crypto.timingSafeEqual`) — sudah didesain di README/PLANNING, pastikan tidak ada early-return sebelum verifikasi (hindari bug "verify setelah proses").
 - Stripe: **raw body** dulu (`req.text()`), baru verify HMAC, baru `JSON.parse`. Kesalahan umum: Next.js body parser otomatis re-serialize JSON sehingga signature selalu mismatch — pastikan route pakai `export const runtime` config yang benar dan tidak ada middleware yang consume body duluan.
 - **Reject webhook tanpa header signature** dengan 401, jangan fallback "proses tanpa verifikasi kalau header kosong" (bug klasik).
 - Idempotency via `WebhookEvent.eventId` unique constraint di DB level (bukan cuma check-then-insert di application code — itu rentan race condition kalau webhook dikirim 2x bersamaan oleh gateway, hal yang normal terjadi).
@@ -217,4 +217,4 @@ Deteksi dini lebih murah daripada mitigasi setelah insiden. Minimal setup:
 
 ---
 
-*Dokumen ini hidup — update tiap ada finding baru dari pentest, code review, atau insiden nyata. Silakan cross-reference status implementasi ke tracker `PLANING.md` §19.*
+*Dokumen ini hidup — update tiap ada finding baru dari pentest, code review, atau insiden nyata. Silakan cross-reference status implementasi ke tracker `PLANNING.md` §19.*

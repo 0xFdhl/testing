@@ -13,7 +13,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["src/lib/**/*.ts", "src/schemas/**/*.ts", "src/proxy.ts"],
+      include: ["src/lib/**/*.ts", "src/schemas/**/*.ts", "src/lib/proxy.ts"],
       exclude: ["src/generated/**", "src/**/*.test.ts"],
     },
   },

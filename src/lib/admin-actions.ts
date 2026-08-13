@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import type { OrderStatus } from "@/generated/prisma/enums";
 import {
@@ -15,6 +15,12 @@ import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { setXenditMode } from "@/lib/xendit/config";
 import {
+  ImageValidationError,
+  StorageConfigError,
+  maxUploadBytes,
+  uploadProductImage,
+} from "@/lib/storage";
+import {
   loginSchema,
   productFormSchema,
   settingsSchema,
@@ -26,6 +32,8 @@ export type ActionResult = {
   success: boolean;
   error?: string;
 };
+
+export type UploadResult = ActionResult & { url?: string };
 
 export async function loginAction(
   _prev: ActionResult | undefined,
@@ -97,6 +105,7 @@ export async function createProductAction(
 
     await logAudit(session, "CREATE", "Product", product.id, { name: product.name });
     revalidatePath("/admin/products");
+    revalidateTag("products", "max");
     redirect(`/admin/products/${product.id}/edit`);
   } catch {
     return { success: false, error: "Failed to create product. Slug may already exist." };
@@ -109,7 +118,23 @@ export async function updateProductAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const session = await requireAdmin();
+
+  const existing = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { images: true },
+  });
+  if (!existing) {
+    return { success: false, error: "Product not found" };
+  }
+
+  const photosAllowed =
+    session.role === "SUPERADMIN" || (await getAdminsCanEditPhotos());
+
   const raw = parseProductFormData(formData);
+  if (!photosAllowed) {
+    raw.images = existing.images;
+  }
+
   const parsed = productFormSchema.safeParse(raw);
 
   if (!parsed.success) {
@@ -143,6 +168,7 @@ export async function updateProductAction(
     await logAudit(session, "UPDATE", "Product", product.id, { name: product.name });
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${productId}/edit`);
+    revalidateTag("products", "max");
     return { success: true };
   } catch {
     return { success: false, error: "Failed to update product" };
@@ -156,9 +182,61 @@ export async function deleteProductAction(productId: string): Promise<ActionResu
     const product = await prisma.product.delete({ where: { id: productId } });
     await logAudit(session, "DELETE", "Product", productId, { name: product.name });
     revalidatePath("/admin/products");
+    revalidateTag("products", "max");
     return { success: true };
   } catch {
     return { success: false, error: "Failed to delete product" };
+  }
+}
+
+export async function uploadProductImageAction(
+  productId: string,
+  formData: FormData,
+): Promise<UploadResult> {
+  const session = await requireAdmin();
+  const allowed = session.role === "SUPERADMIN" || (await getAdminsCanEditPhotos());
+  if (!allowed) {
+    return { success: false, error: "Photo editing is disabled by SUPERADMIN." };
+  }
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { success: false, error: "Tidak ada file yang dipilih." };
+  }
+  if (file.size > maxUploadBytes()) {
+    const mb = (maxUploadBytes() / (1024 * 1024)).toFixed(1);
+    return { success: false, error: `Ukuran melebihi ${mb} MB.` };
+  }
+
+  try {
+    const { url, path } = await uploadProductImage(productId, file);
+
+    // Append ke product.images (drop entry kosong dulu untuk rapi).
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { images: true, name: true },
+    });
+    if (!product) {
+      return { success: false, error: "Product tidak ditemukan." };
+    }
+    const next = [...product.images.filter(Boolean), url];
+    await prisma.product.update({
+      where: { id: productId },
+      data: { images: next },
+    });
+
+    await logAudit(session, "UPLOAD_IMAGE", "Product", productId, {
+      name: product.name,
+      path,
+    });
+    revalidatePath(`/admin/products/${productId}/edit`);
+    revalidateTag("products", "max");
+    return { success: true, url };
+  } catch (err) {
+    if (err instanceof ImageValidationError || err instanceof StorageConfigError) {
+      return { success: false, error: err.message };
+    }
+    return { success: false, error: "Upload gagal. Coba lagi." };
   }
 }
 
@@ -256,13 +334,15 @@ export async function updateSettingsAction(
   const parsed = settingsSchema.safeParse({
     xenditMode: formData.get("xenditMode"),
     appUrl: formData.get("appUrl"),
+    adminsCanEditPhotos:
+      formData.get("adminsCanEditPhotos") === "on" ? "on" : "off",
   });
 
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { xenditMode, appUrl } = parsed.data;
+  const { xenditMode, appUrl, adminsCanEditPhotos } = parsed.data;
 
   await prisma.appSetting.upsert({
     where: { key: "xendit_mode" },
@@ -276,9 +356,28 @@ export async function updateSettingsAction(
     update: { value: appUrl, updatedBy: session.email },
   });
 
+  if (session.role === "SUPERADMIN") {
+    await prisma.appSetting.upsert({
+      where: { key: "admins_can_edit_photos" },
+      create: {
+        key: "admins_can_edit_photos",
+        value: adminsCanEditPhotos,
+        updatedBy: session.email,
+      },
+      update: {
+        value: adminsCanEditPhotos,
+        updatedBy: session.email,
+      },
+    });
+  }
+
   setXenditMode(xenditMode);
 
-  await logAudit(session, "UPDATE", "Settings", undefined, { xenditMode, appUrl });
+  await logAudit(session, "UPDATE", "Settings", undefined, {
+    xenditMode,
+    appUrl,
+    adminsCanEditPhotos,
+  });
   revalidatePath("/admin/settings");
   return { success: true };
 }
@@ -322,4 +421,12 @@ export async function getEffectiveAppUrl(): Promise<string> {
     where: { key: "app_url" },
   });
   return setting?.value ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+}
+
+export async function getAdminsCanEditPhotos(): Promise<boolean> {
+  const setting = await prisma.appSetting.findUnique({
+    where: { key: "admins_can_edit_photos" },
+  });
+  if (setting?.value === "off") return false;
+  return true;
 }

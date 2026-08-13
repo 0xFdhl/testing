@@ -1,8 +1,10 @@
 import { SettingsForm } from "@/components/admin/settings-form";
 import {
+  getAdminsCanEditPhotos,
   getEffectiveAppUrl,
   getEffectiveXenditMode,
 } from "@/lib/admin-actions";
+import { getSession } from "@/lib/auth";
 import { maskSecret } from "@/lib/format-admin";
 import {
   getXenditSecretKey,
@@ -10,11 +12,14 @@ import {
 } from "@/lib/xendit/config";
 
 export default async function AdminSettingsPage() {
-
-  const [xenditMode, appUrl] = await Promise.all([
+  const [xenditMode, appUrl, adminsCanEditPhotos, session] = await Promise.all([
     getEffectiveXenditMode(),
     getEffectiveAppUrl(),
+    getAdminsCanEditPhotos(),
+    getSession(),
   ]);
+
+  const canManagePhotoToggle = session?.role === "SUPERADMIN";
 
   let secretKeyMasked = "Not configured";
   let webhookTokenConfigured = false;
@@ -44,6 +49,8 @@ export default async function AdminSettingsPage() {
       secretKeyMasked={secretKeyMasked}
       webhookTokenConfigured={webhookTokenConfigured}
       securityHeaders={securityHeaders}
+      adminsCanEditPhotos={adminsCanEditPhotos}
+      canManagePhotoToggle={canManagePhotoToggle}
     />
   );
 }

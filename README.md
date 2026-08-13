@@ -67,7 +67,7 @@ Webhook gateway ──▶ verifikasi signature (timing-safe) + idempotency event
 5. **Secret key di server only** (`server-only` import).
 6. **Rate limit** pada endpoint pembuatan payment.
 
-Rincian rencana implementasi lihat [`PLANING.md`](./PLANING.md).
+Rincian rencana implementasi lihat [`PLANNING.md`](./PLANNING.md).
 
 ---
 
@@ -181,7 +181,7 @@ File test yang relevan dengan gateway:
 
 ## Appendix: Production Readiness Audit
 
-> Audit lama (skor 12/100) dipertahankan di sini sebagai konteks historis. Banyak isu sudah ditangani oleh integrasi DB + gateway di atas; sisanya ditrack di `PLANING.md`.
+> Audit lama (skor 12/100) dipertahankan di sini sebagai konteks historis. Banyak isu sudah ditangani oleh integrasi DB + gateway di atas; sisanya ditrack di `PLANNING.md`.
 
 ### Audit Summary
 
@@ -193,7 +193,7 @@ File test yang relevan dengan gateway:
 | **Code Quality** | **35/100** |
 | **Maintainability** | **30/100** |
 
-Saat audit: in-memory store, tanpa stock tracking, endpoint payment publik. Lihat status terbaru di `PLANING.md` untuk progres perbaikan.
+Saat audit: in-memory store, tanpa stock tracking, endpoint payment publik. Lihat status terbaru di `PLANNING.md` untuk progres perbaikan.
 
 ### Must Fix Before Deployment (audit asli)
 
@@ -229,8 +229,8 @@ Saat audit: in-memory store, tanpa stock tracking, endpoint payment publik. Liha
 - **2.4 No Security Headers** — lihat `src/proxy.ts` (CSP).
 - **2.5 Webhook Race Condition** — cek status terminal sebelum update.
 
-Daftar lengkap isu low/medium & edge case lihat commit audit asli (2026-07-09). Status terbaru tiap isu ditrack di `PLANING.md`.
+Daftar lengkap isu low/medium & edge case lihat commit audit asli (2026-07-09). Status terbaru tiap isu ditrack di `PLANNING.md`.
 
 ---
 
-*Dual-gateway architecture documented here. Detailed implementation plan: [`PLANING.md`](./PLANING.md).*
+*Dual-gateway architecture documented here. Detailed implementation plan: [`PLANNING.md`](./PLANNING.md).*

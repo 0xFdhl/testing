@@ -1,49 +1,90 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
-import {
-  OPENING_SCROLL_HEIGHT,
-  useOpeningScroll,
-} from "@/hooks/use-opening-scroll";
+import { motion, type MotionValue } from "framer-motion";
+import { useEffect, type RefObject } from "react";
+import { useOpening } from "@/components/home/opening-provider";
+import { OPENING_LOGO_TEXT } from "@/lib/opening-constants";
 import { cn } from "@/lib/utils";
 
 function OpeningLogo({
   letterSpacing,
   lightOpacity,
   darkOpacity,
+  measureRef,
 }: {
-  letterSpacing: ReturnType<typeof useOpeningScroll>["letterSpacing"];
-  lightOpacity: ReturnType<typeof useOpeningScroll>["logoLightOpacity"];
-  darkOpacity: ReturnType<typeof useOpeningScroll>["logoDarkOpacity"];
+  letterSpacing: MotionValue<string>;
+  lightOpacity: MotionValue<number>;
+  darkOpacity: MotionValue<number>;
+  measureRef: RefObject<HTMLDivElement | null>;
 }) {
   const textClass =
     "block font-sans text-3xl font-bold leading-none lowercase sm:text-4xl md:text-5xl lg:text-[3.25rem]";
 
   return (
-    <span aria-hidden className="relative block select-none whitespace-nowrap">
+    // Font-size ditaruh di elemen pembungkus ini supaya terbaca oleh
+    // getComputedStyle saat pengukuran morph (kebal transform framer).
+    <div
+      ref={measureRef}
+      aria-hidden
+      className={cn(textClass, "relative select-none whitespace-nowrap")}
+    >
       <motion.span
         className={cn(textClass, "absolute inset-0 text-white")}
         style={{ letterSpacing, opacity: lightOpacity }}
       >
-        varcasvi_
+        {OPENING_LOGO_TEXT}
       </motion.span>
       <motion.span
         className={cn(textClass, "relative text-black")}
         style={{ letterSpacing, opacity: darkOpacity }}
       >
-        varcasvi_
+        {OPENING_LOGO_TEXT}
       </motion.span>
-    </span>
+    </div>
   );
 }
 
 export function OpeningOverlay() {
-  const overlayLogoRef = useRef<HTMLDivElement>(null);
+  const opening = useOpening();
+
+  const requestSkip = opening?.requestSkip;
+  const skipIntro = opening?.skipIntro ?? true;
+  const complete = opening?.isComplete ?? true;
+
+  // Keyboard skip: Escape / Space → scroll halus ke akhir intro.
+  // Listener hanya aktif selama intro berjalan & belum selesai.
+  useEffect(() => {
+    if (skipIntro || complete || !requestSkip) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" && event.key !== " ") return;
+      // Jangan membajak ketikan di form field
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      event.preventDefault();
+      requestSkip();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [requestSkip, skipIntro, complete]);
+
+  // Intro diskip (session/reduced motion/tanpa provider) → tidak render
+  // overlay sama sekali.
+  if (!opening || opening.skipIntro) return null;
+
   const {
-    spacerRef,
+    overlayLogoRef,
     letterSpacing,
     radialOpacity,
+    logoTranslateX,
     logoTranslateY,
     logoScale,
     logoRotateX,
@@ -54,29 +95,20 @@ export function OpeningOverlay() {
     navbarZoneOpacity,
     mainOverlayOpacity,
     scrollHintOpacity,
-    isComplete,
-    prefersReducedMotion,
-  } = useOpeningScroll(overlayLogoRef);
-
-  // Reduced motion: skip scroll-hijack spacer + overlay; site remains fully usable.
-  if (prefersReducedMotion) {
-    return null;
-  }
+    skipButtonOpacity,
+  } = opening;
 
   return (
     <>
-      <div
-        ref={spacerRef}
-        aria-hidden
-        className="pointer-events-none w-full shrink-0"
-        style={{ height: OPENING_SCROLL_HEIGHT }}
-      />
-
+      {/* Overlay murni fixed: TIDAK ada spacer. Body dikunci oleh hook
+          selama intro aktif sehingga home di belakang diam total,
+          dan dibuka begitu intro selesai (logo mendarat di navbar). */}
       <motion.div
-        aria-hidden={isComplete}
+        aria-hidden={complete}
         className="pointer-events-none fixed inset-0 z-[60]"
+        style={complete ? { visibility: "hidden" } : undefined}
       >
-        {/* Main backdrop — body only; navbar zone stays clear after 50% */}
+        {/* Main backdrop — body only; navbar zone stays clear after reveal */}
         <motion.div
           className="absolute inset-x-0 bottom-0 top-[calc(env(safe-area-inset-top)+var(--navbar-height))] bg-[#0a0a0a] md:top-[calc(env(safe-area-inset-top)+var(--navbar-height-md))]"
           style={{ opacity: mainOverlayOpacity, willChange: "opacity" }}
@@ -100,7 +132,7 @@ export function OpeningOverlay() {
           }}
         />
 
-        {/* Soft radial light — appears at 20% */}
+        {/* Soft radial light — appears at RADIAL_IN */}
         <motion.div
           className="absolute inset-0 z-[1] flex items-center justify-center"
           style={{ opacity: radialOpacity, willChange: "opacity" }}
@@ -114,30 +146,34 @@ export function OpeningOverlay() {
           />
         </motion.div>
 
-        {/* Animated logo — center → navbar dock */}
+        {/* Morphing logo — center viewport → wordmark navbar */}
         <div
           className="absolute inset-0 z-[2] [perspective:900px]"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <motion.div
-            ref={overlayLogoRef}
-            className="absolute left-1/2 top-1/2 origin-center"
-            style={{
-              x: "-50%",
-              y: logoTranslateY,
-              scale: logoScale,
-              rotateX: logoRotateX,
-              rotateY: logoRotateY,
-              opacity: overlayLogoOpacity,
-              willChange: "transform, opacity",
-            }}
-          >
-            <OpeningLogo
-              letterSpacing={letterSpacing}
-              lightOpacity={logoLightOpacity}
-              darkOpacity={logoDarkOpacity}
-            />
-          </motion.div>
+          {/* Wrapper statis: pusatkan logo via CSS murni, sehingga transform
+              framer di dalamnya murni delta hasil pengukuran (0 → dx/dy) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <motion.div
+              className="origin-center"
+              style={{
+                x: logoTranslateX,
+                y: logoTranslateY,
+                scale: logoScale,
+                rotateX: logoRotateX,
+                rotateY: logoRotateY,
+                opacity: overlayLogoOpacity,
+                willChange: "transform, opacity",
+              }}
+            >
+              <OpeningLogo
+                measureRef={overlayLogoRef}
+                letterSpacing={letterSpacing}
+                lightOpacity={logoLightOpacity}
+                darkOpacity={logoDarkOpacity}
+              />
+            </motion.div>
+          </div>
         </div>
 
         {/* Scroll hint */}
@@ -158,6 +194,18 @@ export function OpeningOverlay() {
             }}
           />
         </motion.div>
+
+        {/* Tombol skip — subtle, jelas saat hover/focus, satu-satunya
+            elemen interaktif di overlay (pointer-events-auto) */}
+        <motion.button
+          type="button"
+          aria-label="Lewati intro"
+          onClick={requestSkip}
+          className="pointer-events-auto absolute bottom-[max(1.75rem,env(safe-area-inset-bottom))] right-5 z-[4] rounded-sm px-3 py-2 text-[10px] font-semibold tracking-[0.32em] text-white/40 uppercase transition-colors duration-300 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:right-8"
+          style={{ opacity: skipButtonOpacity }}
+        >
+          Skip
+        </motion.button>
       </motion.div>
     </>
   );

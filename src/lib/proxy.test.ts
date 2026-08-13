@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { NextResponse } from "next/server";
-import { proxy, config } from "@/proxy";
+import { proxy, config } from "@/lib/proxy";
 
 // The middleware signature is `proxy()` (Next.js injects the request at runtime).
 // We call it without args since it only returns NextResponse.next() with headers.

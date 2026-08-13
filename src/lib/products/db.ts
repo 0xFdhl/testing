@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { normalizeSearchQuery } from "./helpers";
 import type {
@@ -100,10 +101,14 @@ export async function getRelatedProducts(
   return (products as unknown as DbProduct[]).map(mapDbProduct);
 }
 
-export async function getNewArrivals(): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
-  return (products as unknown as DbProduct[]).map(mapDbProduct);
-}
+export const getNewArrivals = unstable_cache(
+  async (): Promise<Product[]> => {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    });
+    return (products as unknown as DbProduct[]).map(mapDbProduct);
+  },
+  ["new-arrivals"],
+  { revalidate: 60, tags: ["products"] },
+);
