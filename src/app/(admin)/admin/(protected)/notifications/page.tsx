@@ -4,6 +4,8 @@ import {
   getNotificationTemplates,
 } from "@/lib/notifications/emit";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminNotificationsPage() {
   const [templates, logs] = await Promise.all([
     getNotificationTemplates(),

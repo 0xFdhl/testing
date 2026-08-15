@@ -1,6 +1,8 @@
 import { WebhooksMonitor } from "@/components/admin/webhooks-monitor";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminWebhooksPage() {
 
   const events = await prisma.webhookEvent.findMany({

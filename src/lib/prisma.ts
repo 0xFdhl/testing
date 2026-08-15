@@ -13,7 +13,11 @@ function resolvePgUrl(raw: string): string {
   return databaseUrl;
 }
 
-const connectionString = resolvePgUrl(process.env.DATABASE_URL ?? "");
+const raw = process.env.DATABASE_URL ?? "";
+const connectionString = resolvePgUrl(raw);
+if (!connectionString) {
+  throw new Error("Missing required environment variable: DATABASE_URL");
+}
 const adapter = new PrismaPg({ connectionString });
 
 const globalForPrisma = globalThis as unknown as {

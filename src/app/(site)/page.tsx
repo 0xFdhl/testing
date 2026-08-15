@@ -6,6 +6,8 @@ import { NewArrivals } from "@/components/home/new-arrivals";
 import { Navbar } from "@/components/layout/navbar";
 import { getNewArrivals } from "@/lib/products/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const newArrivalProducts = await getNewArrivals();
 
