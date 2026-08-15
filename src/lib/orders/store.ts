@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { emitOrderNotification, notificationEventForStatus } from "@/lib/notifications/emit";
 import type { CreateOrderInput, Order, UpdateOrderInput } from "./types";
 
 function toOrder(row: { externalId: string; userId: string | null; xenditInvoiceId: string | null; gatewayInvoiceId: string | null; invoiceUrl: string | null; provider: string; currency: string; status: string; lineItems: unknown; amount: number; customerName: string; customerEmail: string; customerPhone: string; createdAt: Date; paidAt: Date | null; expiredAt: Date | null; cancelledAt: Date | null }): Order {
@@ -93,7 +94,26 @@ export async function transitionOrderStatus(
   if (userId) where.userId = userId;
 
   const result = await prisma.order.updateMany({ where, data });
-  return result.count > 0;
+  if (result.count === 0) return false;
+
+  const event = notificationEventForStatus(to);
+  if (event) {
+    const order = await prisma.order.findUnique({ where: { externalId } });
+    if (order) {
+      await emitOrderNotification(
+        {
+          externalId: order.externalId,
+          userId: order.userId ?? undefined,
+          customerName: order.customerName,
+          amount: order.amount,
+          status: order.status,
+        },
+        event,
+      );
+    }
+  }
+
+  return true;
 }
 
 export async function getOrdersByUserId(

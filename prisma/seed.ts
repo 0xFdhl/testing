@@ -7,6 +7,7 @@ config({ path: resolve(__dirname, "../.env.local"), override: true });
 import { hashSync } from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { DEFAULT_TEMPLATES } from "../src/lib/notifications/templates";
 
 const connectionString = process.env.DATABASE_URL ?? "";
 const adapter = new PrismaPg({ connectionString });
@@ -372,6 +373,22 @@ async function main() {
   }
 
   console.log(`  ✓ ${totalOrders} orders seeded`);
+
+  console.log("Seeding notification templates...");
+
+  for (const [event, template] of Object.entries(DEFAULT_TEMPLATES)) {
+    await prisma.notificationTemplate.upsert({
+      where: { event },
+      update: {},
+      create: {
+        event,
+        title: template.title,
+        message: template.message,
+        sound: template.sound ?? null,
+      },
+    });
+    console.log(`  ✓ ${event}`);
+  }
 
   console.log("Seed complete.");
 }

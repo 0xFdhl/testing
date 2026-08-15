@@ -77,25 +77,25 @@ model VerificationToken {
 }
 
 model Order {
-  id              String          @id @default(cuid())
-  externalId      String          @unique
-  userId          String?
-  xenditInvoiceId String?
+  id               String          @id @default(cuid())
+  externalId       String          @unique
+  userId           String?
+  xenditInvoiceId  String?
   gatewayInvoiceId String?
-  invoiceUrl      String?
-  provider        PaymentProvider @default(xendit)
-  currency        Currency        @default(IDR)
-  status          OrderStatus     @default(PENDING)
-  lineItems       Json
-  amount          Int
-  customerName    String
-  customerEmail   String
-  customerPhone   String
-  createdAt       DateTime        @default(now())
-  paidAt          DateTime?
-  expiredAt       DateTime?
-  cancelledAt    DateTime?
-  user            User?           @relation(fields: [userId], references: [id])
+  invoiceUrl       String?
+  provider         PaymentProvider @default(xendit)
+  currency         Currency        @default(IDR)
+  status           OrderStatus     @default(PENDING)
+  lineItems        Json
+  amount           Int
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  createdAt        DateTime        @default(now())
+  paidAt           DateTime?
+  expiredAt        DateTime?
+  cancelledAt      DateTime?
+  user             User?           @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -146,6 +146,45 @@ model AppSetting {
   value     String
   updatedAt DateTime @updatedAt
   updatedBy String?
+}
+
+model NotificationTemplate {
+  id        String   @id @default(cuid())
+  event     String   @unique
+  enabled   Boolean  @default(true)
+  title     String
+  message   String
+  sound     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NotificationLog {
+  id         String   @id @default(cuid())
+  event      String
+  externalId String?
+  userId     String?
+  title      String
+  message    String
+  sound      String?
+  channel    String
+  status     String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model NotificationSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 enum OrderStatus {

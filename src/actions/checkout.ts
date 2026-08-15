@@ -23,6 +23,7 @@ import {
   deriveCartCheckoutKey,
 } from "@/lib/idempotency";
 import { logger } from "@/lib/logger";
+import { emitOrderNotification } from "@/lib/notifications/emit";
 import { auth } from "@/lib/next-auth";
 import {
   resolveGateway,
@@ -177,6 +178,17 @@ async function processCheckout(
       gatewayInvoiceId: session.sessionId,
       invoiceUrl: session.url,
     });
+
+    await emitOrderNotification(
+      {
+        externalId,
+        userId,
+        customerName: customer.customerName,
+        amount,
+        status: "PENDING",
+      },
+      "order_created",
+    );
 
     return { ok: true, redirectUrl: session.url };
   } catch (err) {

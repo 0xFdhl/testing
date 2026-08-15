@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Bell,
   ChevronDown,
   LayoutDashboard,
   Menu,
@@ -49,6 +50,7 @@ const navSections: NavSection[] = [
   {
     title: "System",
     items: [
+      { href: "/admin/notifications", label: "Notifications", icon: Bell },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],
   },

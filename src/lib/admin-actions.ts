@@ -11,6 +11,7 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { emitOrderNotification, notificationEventForStatus } from "@/lib/notifications/emit";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { setXenditMode } from "@/lib/xendit/config";
@@ -273,6 +274,32 @@ export async function updateOrderStatusAction(
       where: { externalId },
       data: updateData,
     });
+
+    const event = notificationEventForStatus(status);
+    if (event) {
+      const order = await prisma.order.findUnique({
+        where: { externalId },
+        select: {
+          externalId: true,
+          userId: true,
+          customerName: true,
+          amount: true,
+          status: true,
+        },
+      });
+      if (order) {
+        await emitOrderNotification(
+          {
+            externalId: order.externalId,
+            userId: order.userId ?? undefined,
+            customerName: order.customerName,
+            amount: order.amount,
+            status: order.status,
+          },
+          event,
+        );
+      }
+    }
 
     await logAudit(session, "UPDATE_STATUS", "Order", externalId, { status });
     revalidatePath("/admin/orders");

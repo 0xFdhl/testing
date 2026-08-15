@@ -1,5 +1,6 @@
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminTopbar } from "@/components/admin/topbar";
+import { NotificationListener } from "@/components/notifications/notification-listener";
 import { requireAdmin } from "@/lib/auth";
 
 export default async function AdminProtectedLayout({
@@ -16,6 +17,7 @@ export default async function AdminProtectedLayout({
         <AdminTopbar name={session.name} email={session.email} />
         <main id="main-content" className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
+      <NotificationListener />
     </div>
   );
 }
