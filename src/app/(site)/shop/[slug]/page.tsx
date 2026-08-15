@@ -5,16 +5,12 @@ import { ProductDetail } from "@/components/shop/product-detail";
 import { ProductJsonLd } from "@/components/shop/product-jsonld";
 import { YouMayLike } from "@/components/shop/you-may-like";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/db";
-import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
-
-export async function generateStaticParams() {
-  const products = await prisma.product.findMany({ select: { slug: true } });
-  return products.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
