@@ -9,7 +9,7 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { DEFAULT_TEMPLATES } from "../src/lib/notifications/templates";
 
-const connectionString = process.env.DATABASE_URL ?? "";
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "";
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 

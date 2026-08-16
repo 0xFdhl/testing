@@ -13,12 +13,29 @@ function resolvePgUrl(raw: string): string {
   return databaseUrl;
 }
 
+function toTransactionPooler(raw: string): string {
+  const u = new URL(raw);
+  // Supabase session pooler (port 5432) is capped at 15 concurrent sessions.
+  // Route runtime traffic through the transaction pooler (6543, pgbouncer=true),
+  // which supports ~10k connections. Keeps DIRECT_URL (5432) for migrations.
+  if (u.hostname.endsWith(".pooler.supabase.com") && u.port === "5432") {
+    u.port = "6543";
+    u.searchParams.set("pgbouncer", "true");
+  }
+  return u.toString();
+}
+
 const raw = process.env.DATABASE_URL ?? "";
-const connectionString = resolvePgUrl(raw);
+const connectionString = toTransactionPooler(resolvePgUrl(raw));
 if (!connectionString) {
   throw new Error("Missing required environment variable: DATABASE_URL");
 }
-const adapter = new PrismaPg({ connectionString });
+const adapter = new PrismaPg({
+  connectionString,
+  max: 5,
+  connectionTimeoutMillis: 5_000,
+  idleTimeoutMillis: 10_000,
+});
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

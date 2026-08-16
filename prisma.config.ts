@@ -10,6 +10,9 @@ export default defineConfig({
     seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Migrations/seed/studio run against the session-mode pooler (or direct
+    // connection) via DIRECT_URL, while runtime traffic uses the transaction
+    // pooler (DATABASE_URL, port 6543). Transaction pooling breaks DDL/migrations.
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });
