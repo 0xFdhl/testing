@@ -21,9 +21,9 @@ export async function GET(req: Request) {
   } = {};
   if (since) where.createdAt = { gt: since };
   if (userId) {
-    where.OR = [{ userId }, { channel: "test" }];
+    where.OR = [{ userId }];
   } else if (!admin) {
-    where.OR = [{ channel: "test" }];
+    return NextResponse.json({ items: [], now: new Date().toISOString() });
   }
 
   const rows = await prisma.notificationLog.findMany({

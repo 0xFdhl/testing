@@ -2,7 +2,6 @@ import { getSession } from "@/lib/auth";
 import { auth } from "@/lib/next-auth";
 import {
   subscribeAdmins,
-  subscribeBroadcast,
   subscribeUser,
 } from "@/lib/notifications/bus";
 import type { NotificationPayload } from "@/lib/notifications/types";
@@ -52,11 +51,8 @@ export async function GET(req: Request) {
       const unsubscribes: Array<() => void> = [];
       if (userId) {
         unsubscribes.push(subscribeUser(userId, send));
-        unsubscribes.push(subscribeBroadcast(send));
       } else if (admin) {
         unsubscribes.push(subscribeAdmins(send));
-      } else {
-        unsubscribes.push(subscribeBroadcast(send));
       }
 
       const unsubscribe = () => {

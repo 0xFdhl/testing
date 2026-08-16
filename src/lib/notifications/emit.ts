@@ -2,8 +2,8 @@ import "server-only";
 import { formatIdr } from "@/lib/format";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { emitToAdmins, emitToAllUsers, emitToUser } from "./bus";
-import { sendPushToUser } from "./push";
+import { emitToAdmins, emitToUser } from "./bus";
+import { sendPushToAdmins, sendPushToUser } from "./push";
 import { DEFAULT_TEMPLATES, renderTemplate } from "./templates";
 import {
   NOTIFICATION_EVENTS,
@@ -95,6 +95,7 @@ export async function emitOrderNotification(
       await sendPushToUser(order.userId, payload);
     }
     emitToAdmins(payload);
+    await sendPushToAdmins(payload);
   } catch (err) {
     logger.error("notifications.emitOrderNotification failed", {
       event,
@@ -146,7 +147,7 @@ export async function emitTestNotification(
     });
 
     emitToAdmins(payload);
-    emitToAllUsers(payload);
+    await sendPushToAdmins(payload);
     return { ok: true };
   } catch (err) {
     logger.error("notifications.emitTestNotification failed", {

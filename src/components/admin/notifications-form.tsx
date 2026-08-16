@@ -8,6 +8,7 @@ import {
   type ActionResult,
 } from "@/lib/notification-actions";
 import { AVAILABLE_SOUNDS, NOTIFICATION_VARIABLES } from "@/lib/notifications/templates";
+import { AdminPushNotificationToggle } from "@/components/admin/push-toggle";
 import type {
   NotificationLogRecord,
   NotificationTemplateRecord,
@@ -146,6 +147,8 @@ export function NotificationsForm({
           Customize order notification templates, sounds and delivery
         </p>
       </div>
+
+      <AdminPushNotificationToggle />
 
       <div className="space-y-6">
         {templates.map((template) => (

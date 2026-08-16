@@ -48,26 +48,42 @@ export async function savePushSubscription(
   });
 }
 
+export async function saveAdminPushSubscription(
+  adminId: string,
+  sub: { endpoint: string; p256dh: string; auth: string; userAgent?: string },
+): Promise<void> {
+  await prisma.notificationSubscription.upsert({
+    where: { endpoint: sub.endpoint },
+    create: {
+      adminId,
+      endpoint: sub.endpoint,
+      p256dh: sub.p256dh,
+      auth: sub.auth,
+      userAgent: sub.userAgent,
+    },
+    update: {
+      adminId,
+      p256dh: sub.p256dh,
+      auth: sub.auth,
+      userAgent: sub.userAgent,
+    },
+  });
+}
+
 export async function removePushSubscription(endpoint: string): Promise<void> {
   await prisma.notificationSubscription.deleteMany({ where: { endpoint } });
 }
 
-export async function sendPushToUser(
-  userId: string,
+async function sendPush(
+  subs: Array<{ endpoint: string; p256dh: string; auth: string }>,
   payload: NotificationPayload,
+  url: string,
 ): Promise<void> {
-  if (!ensureVapid()) return;
-
-  const subs = await prisma.notificationSubscription.findMany({
-    where: { userId },
-  });
-  if (subs.length === 0) return;
-
   const data = JSON.stringify({
     title: payload.title,
     body: payload.message,
-    icon: "/favicon.ico",
-    url: "/account",
+    icon: "/icons/icon-192.png",
+    url,
   });
 
   await Promise.all(
@@ -95,4 +111,36 @@ export async function sendPushToUser(
       }
     }),
   );
+}
+
+export async function sendPushToUser(
+  userId: string,
+  payload: NotificationPayload,
+): Promise<void> {
+  if (!ensureVapid()) return;
+
+  const subs = await prisma.notificationSubscription.findMany({
+    where: { userId },
+  });
+  if (subs.length === 0) return;
+
+  await sendPush(subs, payload, "/account");
+}
+
+export async function sendPushToAdmins(
+  payload: NotificationPayload,
+): Promise<void> {
+  if (!ensureVapid()) return;
+
+  const subs = await prisma.notificationSubscription.findMany({
+    where: { adminId: { not: null } },
+  });
+  if (subs.length === 0) return;
+
+  const url =
+    payload.externalId
+      ? `/admin/orders/${encodeURIComponent(payload.externalId)}`
+      : "/admin/orders";
+
+  await sendPush(subs, payload, url);
 }

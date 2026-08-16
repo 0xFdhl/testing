@@ -42,24 +42,10 @@ export function subscribeAdmins(
   return () => emitter.off("admins", listener);
 }
 
-export function subscribeBroadcast(
-  listener: (payload: NotificationPayload) => void,
-): () => void {
-  if (emitter.listenerCount("users") >= MAX_LISTENERS_PER_CHANNEL) {
-    return () => {};
-  }
-  emitter.on("users", listener);
-  return () => emitter.off("users", listener);
-}
-
 export function emitToUser(userId: string, payload: NotificationPayload): void {
   emitter.emit(`user:${userId}`, payload);
 }
 
 export function emitToAdmins(payload: NotificationPayload): void {
   emitter.emit("admins", payload);
-}
-
-export function emitToAllUsers(payload: NotificationPayload): void {
-  emitter.emit("users", payload);
 }

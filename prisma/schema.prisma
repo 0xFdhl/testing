@@ -176,15 +176,17 @@ model NotificationLog {
 }
 
 model NotificationSubscription {
-  id        String   @id @default(cuid())
-  userId    String
-  endpoint  String   @unique
+  id        String    @id @default(cuid())
+  userId    String?
+  adminId   String?
+  endpoint  String    @unique
   p256dh    String
   auth      String
   userAgent String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId])
+  @@index([adminId])
 }
 
 enum OrderStatus {
