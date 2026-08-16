@@ -7,7 +7,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let data = { title: "Notification", body: "", icon: "/favicon.ico", url: "/account" };
+  let data = { title: "Notification", body: "", icon: "/icons/icon-192.png", url: "/account" };
   try {
     data = { ...data, ...(event.data ? event.data.json() : {}) };
   } catch {
