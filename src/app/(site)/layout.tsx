@@ -2,6 +2,7 @@ import { AuthProvider } from "@/components/auth/auth-provider";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { CartShell } from "@/components/cart/cart-shell";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { InstallAppBanner } from "@/components/layout/install-app-banner";
 import { NotificationListener } from "@/components/notifications/notification-listener";
 import { PushSubscriptionManager } from "@/components/notifications/push-subscription";
 
@@ -18,6 +19,7 @@ export default function SiteLayout({
         <CartShell />
         <NotificationListener />
         <PushSubscriptionManager />
+        <InstallAppBanner />
       </CartProvider>
     </AuthProvider>
   );

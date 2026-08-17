@@ -99,6 +99,23 @@ export function UserMenu({ isLight }: { isLight: boolean }) {
 
   const handleSignOut = useCallback(async () => {
     setOpen(false);
+    try {
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          const endpoint = subscription.endpoint;
+          await subscription.unsubscribe();
+          await fetch("/api/notifications/push/unsubscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ endpoint }),
+          });
+        }
+      }
+    } catch {
+      // push unsubscribe gagal — lanjut sign out
+    }
     await signOut({ callbackUrl: "/" });
   }, []);
 

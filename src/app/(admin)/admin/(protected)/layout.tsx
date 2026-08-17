@@ -1,5 +1,6 @@
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminTopbar } from "@/components/admin/topbar";
+import { InstallAppBanner } from "@/components/layout/install-app-banner";
 import { NotificationListener } from "@/components/notifications/notification-listener";
 import { requireAdmin } from "@/lib/auth";
 
@@ -18,6 +19,7 @@ export default async function AdminProtectedLayout({
         <main id="main-content" className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
       <NotificationListener />
+      <InstallAppBanner />
     </div>
   );
 }
