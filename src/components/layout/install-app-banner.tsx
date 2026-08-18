@@ -70,7 +70,7 @@ export function InstallAppBanner() {
           <p className="mt-0.5 text-xs text-zinc-400">
             {isIos() && !promptEvent
               ? "Tap Share, then Add to Home Screen."
-              : "Get push notifications and faster access."}
+              : "Install for faster access and an app-like experience."}
           </p>
         </div>
         <button

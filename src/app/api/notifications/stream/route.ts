@@ -1,29 +1,19 @@
 import { getSession } from "@/lib/auth";
-import { auth } from "@/lib/next-auth";
-import {
-  subscribeAdmins,
-  subscribeUser,
-} from "@/lib/notifications/bus";
+import { subscribeAdmins } from "@/lib/notifications/bus";
 import type { NotificationPayload } from "@/lib/notifications/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
-  const admin = !userId ? await getSession() : null;
+  const admin = await getSession();
+  if (!admin) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   const encoder = new TextEncoder();
 
   if (process.env.NODE_ENV === "development") {
-    console.log(
-      "[notifications][stream] connected",
-      userId
-        ? `user:${userId} + broadcast`
-        : admin
-          ? "admin"
-          : "anonymous broadcast",
-    );
+    console.log("[notifications][stream] admin connected");
   }
 
   const stream = new ReadableStream<Uint8Array>({
@@ -48,16 +38,7 @@ export async function GET(req: Request) {
         }
       }, 15_000);
 
-      const unsubscribes: Array<() => void> = [];
-      if (userId) {
-        unsubscribes.push(subscribeUser(userId, send));
-      } else if (admin) {
-        unsubscribes.push(subscribeAdmins(send));
-      }
-
-      const unsubscribe = () => {
-        for (const off of unsubscribes) off();
-      };
+      const unsubscribe = subscribeAdmins(send);
 
       req.signal.addEventListener("abort", () => {
         clearInterval(keepAlive);

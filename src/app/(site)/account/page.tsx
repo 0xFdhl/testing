@@ -3,7 +3,6 @@ import Link from "next/link";
 import { auth } from "@/lib/next-auth";
 import { getOrdersByUserId } from "@/lib/orders";
 import { Navbar } from "@/components/layout/navbar";
-import { PushNotificationToggle } from "@/components/notifications/push-toggle";
 import { formatIdr, formatDate } from "@/lib/format-admin";
 import type { Metadata } from "next";
 
@@ -84,10 +83,6 @@ export default async function AccountPage() {
             </p>
             <p className="mt-1 text-xs text-zinc-500 uppercase tracking-wider">Last Order</p>
           </div>
-        </div>
-
-        <div className="mt-10">
-          <PushNotificationToggle />
         </div>
 
         <div className="mt-12">

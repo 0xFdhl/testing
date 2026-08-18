@@ -7,7 +7,8 @@ config({ path: resolve(__dirname, "../.env.local"), override: true });
 import { hashSync } from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { DEFAULT_TEMPLATES } from "../src/lib/notifications/templates";
+import { DEFAULT_TEMPLATES, renderTemplate } from "../src/lib/notifications/templates";
+import { formatIdr } from "../src/lib/format";
 
 const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "";
 const adapter = new PrismaPg({ connectionString });
@@ -389,6 +390,49 @@ async function main() {
     });
     console.log(`  ✓ ${event}`);
   }
+
+  console.log("Seeding notification logs...");
+
+  const seededOrders = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  for (const order of seededOrders) {
+    const events =
+      order.status === "PAID"
+        ? ["order_created", "payment_success"]
+        : order.status === "EXPIRED"
+          ? ["order_created", "payment_expired"]
+          : order.status === "CANCELLED"
+            ? ["order_created", "order_cancelled"]
+            : ["order_created"];
+
+    for (const event of events) {
+      const template = DEFAULT_TEMPLATES[event as keyof typeof DEFAULT_TEMPLATES];
+      if (!template) continue;
+      const vars = {
+        customer_name: order.customerName,
+        order_id: order.externalId,
+        total: formatIdr(order.amount),
+        status: order.status,
+      };
+      await prisma.notificationLog.create({
+        data: {
+          event,
+          externalId: order.externalId,
+          title: renderTemplate(template.title, vars),
+          message: renderTemplate(template.message, vars),
+          sound: template.sound ?? null,
+          channel: "realtime",
+          status: "sent",
+          createdAt: order.createdAt,
+        },
+      });
+    }
+  }
+
+  console.log(`  ✓ ${seededOrders.length} orders → notification logs`);
 
   console.log("Seed complete.");
 }

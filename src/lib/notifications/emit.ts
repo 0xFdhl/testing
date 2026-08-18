@@ -2,8 +2,8 @@ import "server-only";
 import { formatIdr } from "@/lib/format";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { emitToAdmins, emitToUser } from "./bus";
-import { sendPushToAdmins, sendPushToUser } from "./push";
+import { emitToAdmins } from "./bus";
+import { sendPushToAdmins } from "./push";
 import { DEFAULT_TEMPLATES, renderTemplate } from "./templates";
 import {
   NOTIFICATION_EVENTS,
@@ -90,10 +90,6 @@ export async function emitOrderNotification(
 
     if (!enabled) return;
 
-    if (order.userId) {
-      emitToUser(order.userId, payload);
-      await sendPushToUser(order.userId, payload);
-    }
     emitToAdmins(payload);
     await sendPushToAdmins(payload);
   } catch (err) {

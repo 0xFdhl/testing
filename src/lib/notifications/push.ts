@@ -26,28 +26,6 @@ export function getVapidPublicKey(): string | null {
   return VAPID_PUBLIC_KEY || null;
 }
 
-export async function savePushSubscription(
-  userId: string,
-  sub: { endpoint: string; p256dh: string; auth: string; userAgent?: string },
-): Promise<void> {
-  await prisma.notificationSubscription.upsert({
-    where: { endpoint: sub.endpoint },
-    create: {
-      userId,
-      endpoint: sub.endpoint,
-      p256dh: sub.p256dh,
-      auth: sub.auth,
-      userAgent: sub.userAgent,
-    },
-    update: {
-      userId,
-      p256dh: sub.p256dh,
-      auth: sub.auth,
-      userAgent: sub.userAgent,
-    },
-  });
-}
-
 export async function saveAdminPushSubscription(
   adminId: string,
   sub: { endpoint: string; p256dh: string; auth: string; userAgent?: string },
@@ -84,6 +62,7 @@ async function sendPush(
     body: payload.message,
     icon: "/icons/icon-192.png",
     url,
+    orderId: payload.externalId,
   });
 
   await Promise.all(
@@ -111,20 +90,6 @@ async function sendPush(
       }
     }),
   );
-}
-
-export async function sendPushToUser(
-  userId: string,
-  payload: NotificationPayload,
-): Promise<void> {
-  if (!ensureVapid()) return;
-
-  const subs = await prisma.notificationSubscription.findMany({
-    where: { userId },
-  });
-  if (subs.length === 0) return;
-
-  await sendPush(subs, payload, "/account");
 }
 
 export async function sendPushToAdmins(

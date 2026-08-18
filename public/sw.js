@@ -1,3 +1,10 @@
+const DEFAULT_URL = "/admin/orders";
+
+function orderTag(orderId) {
+  if (orderId) return `order-${orderId}`;
+  return `order-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 self.addEventListener("install", () => {
   self.skipWaiting();
 });
@@ -7,7 +14,13 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let data = { title: "Notification", body: "", icon: "/icons/icon-192.png", url: "/account" };
+  let data = {
+    title: "Notification",
+    body: "",
+    icon: "/icons/icon-192.png",
+    url: DEFAULT_URL,
+    orderId: null,
+  };
   try {
     data = { ...data, ...(event.data ? event.data.json() : {}) };
   } catch {
@@ -19,7 +32,9 @@ self.addEventListener("push", (event) => {
       body: data.body,
       icon: data.icon,
       badge: data.icon,
-      tag: "order-notification",
+      tag: orderTag(data.orderId),
+      renotify: true,
+      vibrate: [200, 100, 200],
       data: { url: data.url },
     }),
   );
@@ -27,7 +42,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = event.notification.data?.url ?? "/account";
+  const url = event.notification.data?.url ?? DEFAULT_URL;
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {

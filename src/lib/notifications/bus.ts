@@ -20,18 +20,6 @@ emitter.setMaxListeners(100);
 
 const MAX_LISTENERS_PER_CHANNEL = 50;
 
-export function subscribeUser(
-  userId: string,
-  listener: (payload: NotificationPayload) => void,
-): () => void {
-  const channel = `user:${userId}`;
-  if (emitter.listenerCount(channel) >= MAX_LISTENERS_PER_CHANNEL) {
-    return () => {};
-  }
-  emitter.on(channel, listener);
-  return () => emitter.off(channel, listener);
-}
-
 export function subscribeAdmins(
   listener: (payload: NotificationPayload) => void,
 ): () => void {
@@ -40,10 +28,6 @@ export function subscribeAdmins(
   }
   emitter.on("admins", listener);
   return () => emitter.off("admins", listener);
-}
-
-export function emitToUser(userId: string, payload: NotificationPayload): void {
-  emitter.emit(`user:${userId}`, payload);
 }
 
 export function emitToAdmins(payload: NotificationPayload): void {

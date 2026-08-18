@@ -1,30 +1,22 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { auth } from "@/lib/next-auth";
 import { prisma } from "@/lib/prisma";
 import type { NotificationEvent, NotificationPayload } from "@/lib/notifications/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
-  const admin = !userId ? await getSession() : null;
+  const admin = await getSession();
+  if (!admin) {
+    return NextResponse.json({ items: [], now: new Date().toISOString() });
+  }
 
   const url = new URL(req.url);
   const sinceRaw = url.searchParams.get("since");
   const since = sinceRaw && !Number.isNaN(Date.parse(sinceRaw)) ? new Date(sinceRaw) : undefined;
 
-  const where: {
-    createdAt?: { gt: Date };
-    OR?: Array<Record<string, unknown>>;
-  } = {};
+  const where: { createdAt?: { gt: Date } } = {};
   if (since) where.createdAt = { gt: since };
-  if (userId) {
-    where.OR = [{ userId }];
-  } else if (!admin) {
-    return NextResponse.json({ items: [], now: new Date().toISOString() });
-  }
 
   const rows = await prisma.notificationLog.findMany({
     where,
