@@ -19,7 +19,10 @@ export default async function AdminProtectedLayout({
         <main id="main-content" className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
       <NotificationListener />
-      <InstallAppBanner />
+      <InstallAppBanner
+        appName="varcasvi_ Admin"
+        benefit="Get push notifications for new orders and payments."
+      />
     </div>
   );
 }

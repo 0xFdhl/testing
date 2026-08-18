@@ -21,7 +21,13 @@ function isStandalone(): boolean {
   );
 }
 
-export function InstallAppBanner() {
+export function InstallAppBanner({
+  appName = "varcasvi_ app",
+  benefit = "Install for faster access and an app-like experience.",
+}: {
+  appName?: string;
+  benefit?: string;
+}) {
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIos, setShowIos] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -66,11 +72,11 @@ export function InstallAppBanner() {
           <Download className="h-5 w-5 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-white">Install varcasvi_ app</p>
+          <p className="text-sm font-medium text-white">Install {appName}</p>
           <p className="mt-0.5 text-xs text-zinc-400">
             {isIos() && !promptEvent
               ? "Tap Share, then Add to Home Screen."
-              : "Install for faster access and an app-like experience."}
+              : benefit}
           </p>
         </div>
         <button
