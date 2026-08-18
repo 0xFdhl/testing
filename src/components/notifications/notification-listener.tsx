@@ -16,6 +16,7 @@ export function NotificationListener() {
   const [current, setCurrent] = useState<NotificationPayload | null>(null);
   const seenIds = useRef(new Set<string>());
   const sinceRef = useRef<string | null>(null);
+  const firstLoad = useRef(true);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -34,6 +35,11 @@ export function NotificationListener() {
           items: NotificationPayload[];
           now: string;
         };
+        if (firstLoad.current) {
+          firstLoad.current = false;
+          sinceRef.current = now;
+          return;
+        }
         sinceRef.current = now;
         for (const payload of items) {
           if (seenIds.current.has(payload.id)) continue;
