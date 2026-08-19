@@ -179,7 +179,7 @@ async function processCheckout(
       invoiceUrl: session.url,
     });
 
-    await emitOrderNotification(
+    void emitOrderNotification(
       {
         externalId,
         userId,
