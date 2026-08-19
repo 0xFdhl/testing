@@ -1,6 +1,7 @@
 import { loginSchema } from "@/schemas/admin";
 import { authenticateAdmin, createSessionToken, setSessionCookie } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { InstallAppBanner } from "@/components/layout/install-app-banner";
 
 async function login(formData: FormData) {
   "use server";
@@ -84,6 +85,11 @@ export default async function AdminLoginPage({
           </button>
         </form>
       </div>
+
+      <InstallAppBanner
+        appName="varcasvi_ Admin"
+        benefit="Get push notifications for new orders and payments."
+      />
     </div>
   );
 }
