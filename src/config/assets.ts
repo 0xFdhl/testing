@@ -20,8 +20,8 @@ export const heroSlides = [
   {
     id: "slide-goggles",
     src: "/images/products/asuka-thermal.webp",
-    alt: "Orbit Photochromic Goggles — varcasvi_",
-    href: "/shop/orbit-goggles",
+    alt: "Apex Splitboard — varcasvi_",
+    href: "/shop/apex-splitboard",
   },
 ] as const;
 
@@ -32,17 +32,17 @@ export const shopBannerImage = {
 
 export const featuredBannerPanels = [
   {
-    id: "panel-softshell",
-    src: "/images/products/stella-noctis-thermal-1.webp",
-    alt: "Pulse Softshell Jacket",
+    id: "panel-boots",
+    src: "/images/products/rem-boxy-tshirt.webp",
+    alt: "Drift Snowboard Boots",
     buttonAlign: "left" as const,
-    href: "/shop/pulse-softshell",
+    href: "/shop/drift-snowboard-boots",
   },
   {
-    id: "panel-helmet",
-    src: "/images/products/rem-boxy-tshirt.webp",
-    alt: "Cascade MIPS Helmet",
+    id: "panel-parka",
+    src: "/images/products/stella-noctis-thermal.webp",
+    alt: "Sigma Down Parka",
     buttonAlign: "center" as const,
-    href: "/shop/cascade-helmet",
+    href: "/shop/sigma-down-parka",
   },
 ];

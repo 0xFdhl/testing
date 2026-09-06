@@ -67,23 +67,6 @@ const products = [
     returnsInfo,
   },
   {
-    slug: "pulse-softshell",
-    name: "Pulse Softshell Jacket",
-    category: "jacket",
-    price: 199_000,
-    description:
-      "Versatile softshell jacket for high-output activities. Breathable, stretch-woven fabric with a DWR finish blocks light snow and wind while keeping you comfortable on the ascent.",
-    images: ["/images/products/stella-noctis-thermal-1.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 5, S: 8, M: 15, L: 12, XL: 6 },
-    colorLabel: "Grey / Blue / Red",
-    fitNote: "Regular fit — true to size",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-
-  {
     slug: "phantom-snowboard",
     name: "Phantom Snowboard",
     category: "snowboard",
@@ -133,107 +116,6 @@ const products = [
     shippingInfo,
     returnsInfo,
   },
-
-  {
-    slug: "vector-skis",
-    name: "Vector All-Mountain Skis",
-    category: "ski",
-    price: 649_000,
-    description:
-      "A versatile all-mountain ski with a 95mm waist, titanal laminate for dampening, and a early-rise tip for effortless turn initiation. Equally at home on groomers and in moguls.",
-    images: ["/images/products/hoodie-zipp-diagonal.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 0, S: 0, M: 6, L: 9, XL: 4 },
-    badge: "Staff Pick",
-    colorLabel: "White / Black / Orange",
-    fitNote: "Length: M (168cm), L (176cm), XL (184cm)",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-  {
-    slug: "summit-ski-boots",
-    name: "Summit Ski Boots",
-    category: "ski",
-    price: 379_000,
-    description:
-      "Performance ski boots with a 120 flex index, GripWalk soles, and a fully customizable thermo-formable liner. Micro-adjustable buckles let you dial in the fit on the fly.",
-    images: ["/images/products/stella-noctis-thermal.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 0, S: 0, M: 8, L: 10, XL: 3 },
-    colorLabel: "Black / Carbon",
-    fitNote: "Mondo sizing. Heat molding recommended for best fit.",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-  {
-    slug: "ridge-ski-poles",
-    name: "Ridge Ski Poles",
-    category: "ski",
-    price: 79_000,
-    description:
-      "Lightweight 7075 aluminum poles with a contoured cork grip and adjustable strap. The tapered tip penetrates firm snow easily. Sold as a pair.",
-    images: ["/images/products/stella-noctis-thermal-1.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 15, S: 12, M: 20, L: 15, XL: 10 },
-    colorLabel: "Black / Silver / Red",
-    fitNote: "Height-based sizing included in product guide.",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-
-  {
-    slug: "orbit-goggles",
-    name: "Orbit Photochromic Goggles",
-    category: "goggles",
-    price: 189_000,
-    description:
-      "Photochromic lenses that adapt from CAT 1 to CAT 3 coverage, so you never have to swap lenses from dawn to dusk. Anti-fog coating and a comfortable triple-layer face foam.",
-    images: ["/images/products/ashley-thermal.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 0, S: 5, M: 14, L: 12, XL: 6 },
-    badge: "New",
-    colorLabel: "Black / White / Neon",
-    fitNote: "Fits medium to large faces. Helmet-compatible.",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-  {
-    slug: "cascade-helmet",
-    name: "Cascade MIPS Helmet",
-    category: "goggles",
-    price: 229_000,
-    description:
-      "In-mold construction with MIPS protection system reduces rotational forces on impact. 14 adjustable vents, a Fidlock magnetic buckle, and a removable ear pad design.",
-    images: ["/images/products/asuka-thermal.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 0, S: 0, M: 10, L: 10, XL: 5 },
-    colorLabel: "Matte Black / White / Grey",
-    fitNote: "Adjustable dial fit system. M (55–58cm), L (59–62cm), XL (62–65cm)",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
-  {
-    slug: "frost-lens-kit",
-    name: "Frost Lens Kit",
-    category: "goggles",
-    price: 49_000,
-    description:
-      "Interchangeable lens kit for the Orbit frame. Includes a CAT 0 clear lens for night riding and a CAT 4 mirror lens for extreme sun. Microfiber carry pouch included.",
-    images: ["/images/products/rem-boxy-tshirt.webp"],
-    sizes: ["M", "L", "XL"],
-    stock: { XS: 20, S: 15, M: 25, L: 20, XL: 10 },
-    badge: "Sale",
-    colorLabel: "Clear / Gold Mirror",
-    fitNote: "Compatible with Orbit Goggles only.",
-    sizingInfo,
-    shippingInfo,
-    returnsInfo,
-  },
 ];
 
 async function main() {
@@ -256,6 +138,22 @@ async function main() {
   console.log(`  ✓ Admin user — ${adminEmail} / ${adminPassword}`);
 
   console.log("Seeding products...");
+
+  const removedSlugs = [
+    "pulse-softshell",
+    "vector-skis",
+    "summit-ski-boots",
+    "ridge-ski-poles",
+    "orbit-goggles",
+    "cascade-helmet",
+    "frost-lens-kit",
+  ];
+  const removed = await prisma.product.deleteMany({
+    where: { slug: { in: removedSlugs } },
+  });
+  if (removed.count > 0) {
+    console.log(`  ✓ Removed ${removed.count} products with duplicate images`);
+  }
 
   for (const p of products) {
     await prisma.product.upsert({
