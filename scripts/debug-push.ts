@@ -29,6 +29,12 @@ async function main() {
     } catch (e) {
       const err = e as { statusCode?: number; message?: string };
       console.log("  -> FAIL statusCode:", err.statusCode, "| msg:", err.message?.slice(0, 200));
+      if (err.statusCode === 403 || err.statusCode === 404 || err.statusCode === 410) {
+        await prisma.notificationSubscription.deleteMany({
+          where: { endpoint: s.endpoint },
+        });
+        console.log("  -> stale subscription removed");
+      }
     }
   }
 }

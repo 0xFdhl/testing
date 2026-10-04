@@ -3,6 +3,7 @@ import { CartProvider } from "@/components/cart/cart-provider";
 import { CartShell } from "@/components/cart/cart-shell";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { InstallAppBanner } from "@/components/layout/install-app-banner";
+import { StoreVisitTracker } from "@/components/analytics/store-visit-tracker";
 
 export default function SiteLayout({
   children,
@@ -12,6 +13,7 @@ export default function SiteLayout({
   return (
     <AuthProvider>
       <CartProvider>
+        <StoreVisitTracker />
         {children}
         <SiteFooter />
         <CartShell />

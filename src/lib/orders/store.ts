@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { emitOrderNotification, notificationEventForStatus } from "@/lib/notifications/emit";
 import type { CreateOrderInput, Order, UpdateOrderInput } from "./types";
+import { addItemsToStock, getRestockLineItems } from "./stock";
 
 function toOrder(row: { externalId: string; userId: string | null; xenditInvoiceId: string | null; gatewayInvoiceId: string | null; invoiceUrl: string | null; provider: string; currency: string; status: string; lineItems: unknown; amount: number; customerName: string; customerEmail: string; customerPhone: string; createdAt: Date; paidAt: Date | null; expiredAt: Date | null; cancelledAt: Date | null }): Order {
   return {
@@ -90,27 +91,70 @@ export async function transitionOrderStatus(
   if (patch.expiredAt) data.expiredAt = patch.expiredAt;
   if (patch.cancelledAt) data.cancelledAt = patch.cancelledAt;
 
-  const where: Record<string, unknown> = { externalId, status: from };
-  if (userId) where.userId = userId;
+  const shouldRestoreStock =
+    from === "PENDING" && (to === "CANCELLED" || to === "EXPIRED");
 
-  const result = await prisma.order.updateMany({ where, data });
-  if (result.count === 0) return false;
+  const transitionedOrder = await prisma.$transaction(
+    async (tx) => {
+      const order = await tx.order.findFirst({
+        where: {
+          externalId,
+          status: from,
+          ...(userId ? { userId } : {}),
+        },
+      });
+      if (!order) return null;
+
+      const result = await tx.order.updateMany({
+        where: { id: order.id, status: from },
+        data,
+      });
+      if (result.count === 0) return null;
+
+      if (shouldRestoreStock) {
+        const items = getRestockLineItems(order.lineItems);
+        const byProduct = new Map<string, typeof items>();
+        for (const item of items) {
+          const existing = byProduct.get(item.productSlug) ?? [];
+          existing.push(item);
+          byProduct.set(item.productSlug, existing);
+        }
+
+        for (const [productSlug, productItems] of byProduct) {
+          const product = await tx.product.findUnique({ where: { slug: productSlug } });
+          if (!product) continue;
+          const nextStock = addItemsToStock(
+            product.stock as Record<string, number>,
+            productItems,
+          );
+          const restored = await tx.product.updateMany({
+            where: { id: product.id, updatedAt: product.updatedAt },
+            data: { stock: nextStock },
+          });
+          if (restored.count === 0) {
+            throw new Error(`Stock changed while restoring ${productSlug}`);
+          }
+        }
+      }
+
+      return order;
+    },
+    { isolationLevel: "Serializable" },
+  );
+  if (!transitionedOrder) return false;
 
   const event = notificationEventForStatus(to);
   if (event) {
-    const order = await prisma.order.findUnique({ where: { externalId } });
-    if (order) {
-      await emitOrderNotification(
-        {
-          externalId: order.externalId,
-          userId: order.userId ?? undefined,
-          customerName: order.customerName,
-          amount: order.amount,
-          status: order.status,
-        },
-        event,
-      );
-    }
+    await emitOrderNotification(
+      {
+        externalId: transitionedOrder.externalId,
+        userId: transitionedOrder.userId ?? undefined,
+        customerName: transitionedOrder.customerName,
+        amount: transitionedOrder.amount,
+        status: to,
+      },
+      event,
+    );
   }
 
   return true;

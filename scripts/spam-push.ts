@@ -127,7 +127,7 @@ async function main() {
               } catch (err) {
                 const statusCode = (err as { statusCode?: number })?.statusCode;
                 const message = (err as { message?: string })?.message ?? String(err);
-                if (statusCode === 404 || statusCode === 410) {
+                if (statusCode === 403 || statusCode === 404 || statusCode === 410) {
                   stale.add(sub.endpoint);
                 } else {
                   failed++;

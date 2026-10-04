@@ -77,7 +77,7 @@ async function sendPush(
         );
       } catch (err) {
         const statusCode = (err as { statusCode?: number })?.statusCode;
-        if (statusCode === 404 || statusCode === 410) {
+        if (statusCode === 403 || statusCode === 404 || statusCode === 410) {
           await prisma.notificationSubscription.deleteMany({
             where: { endpoint: sub.endpoint },
           });

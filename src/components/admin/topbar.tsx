@@ -16,9 +16,8 @@ export function AdminTopbar({ name, email }: AdminTopbarProps) {
     startTransition(async () => {
       try {
         if ("serviceWorker" in navigator) {
-          const byScope = await navigator.serviceWorker.getRegistration("/admin/");
-          const registration = byScope ?? (await navigator.serviceWorker.ready);
-          const subscription = await registration.pushManager.getSubscription();
+          const registration = await navigator.serviceWorker.getRegistration("/admin/");
+          const subscription = await registration?.pushManager.getSubscription();
           if (subscription) {
             const endpoint = subscription.endpoint;
             await subscription.unsubscribe();

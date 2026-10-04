@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { resolvePushState } from "@/lib/notifications/push-state";
 
 type PushState =
   | "checking"
@@ -46,10 +47,49 @@ function getInitialPushState(): PushState {
 }
 
 async function getAdminRegistration(): Promise<ServiceWorkerRegistration | null> {
-  const byScope = await navigator.serviceWorker.getRegistration("/admin/");
-  if (byScope) return byScope;
-  const active = await navigator.serviceWorker.ready;
-  return active;
+  return (await navigator.serviceWorker.getRegistration("/admin/")) ?? null;
+}
+
+function applicationServerKeyMatches(
+  subscription: PushSubscription,
+  publicKey: string,
+): boolean {
+  const actual = subscription.options.applicationServerKey;
+  if (!actual) return false;
+  const expected = new Uint8Array(urlBase64ToUint8Array(publicKey));
+  const current = new Uint8Array(actual);
+  return (
+    current.length === expected.length &&
+    current.every((value, index) => value === expected[index])
+  );
+}
+
+async function saveSubscription(subscription: PushSubscription): Promise<Response> {
+  const subJson = subscription.toJSON() as {
+    endpoint?: string;
+    keys?: { p256dh?: string; auth?: string };
+  };
+
+  return fetch("/api/admin/notifications/push/subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      endpoint: subJson.endpoint ?? "",
+      p256dh: subJson.keys?.p256dh ?? "",
+      auth: subJson.keys?.auth ?? "",
+      userAgent: navigator.userAgent,
+    }),
+  });
+}
+
+async function removeSubscription(subscription: PushSubscription): Promise<void> {
+  const endpoint = subscription.endpoint;
+  await subscription.unsubscribe();
+  await fetch("/api/admin/notifications/push/unsubscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ endpoint }),
+  });
 }
 
 export function AdminPushNotificationToggle() {
@@ -80,14 +120,35 @@ export function AdminPushNotificationToggle() {
             const registration = await getAdminRegistration();
             const subscription = await registration?.pushManager.getSubscription();
             if (subscription) {
-              if (!cancelled) setState("granted");
+              if (!applicationServerKeyMatches(subscription, data.publicKey)) {
+                await removeSubscription(subscription);
+                if (!cancelled) {
+                  setState(resolvePushState(Notification.permission, false));
+                }
+                return;
+              }
+              const save = await saveSubscription(subscription);
+              if (!cancelled) {
+                if (save.ok) {
+                  setState(resolvePushState(Notification.permission, true));
+                } else {
+                  setErrorMessage("Could not sync this device with the server. Try again.");
+                  setState("error");
+                }
+              }
               return;
             }
           } catch {
             // no active registration yet — fall through to permission state
           }
+          if (!cancelled) {
+            setState(resolvePushState(Notification.permission, false));
+          }
+          return;
         }
-        if (!cancelled) setState(Notification.permission);
+        if (!cancelled) {
+          setState(resolvePushState(Notification.permission, false));
+        }
       } catch {
         if (!cancelled) setState("unconfigured");
       }
@@ -127,25 +188,17 @@ export function AdminPushNotificationToggle() {
       const registration = await navigator.serviceWorker.register("/admin/sw.js", {
         scope: "/admin/",
       });
-      const subscription = await registration.pushManager.subscribe({
+      let subscription = await registration.pushManager.getSubscription();
+      if (subscription && !applicationServerKeyMatches(subscription, publicKey)) {
+        await removeSubscription(subscription);
+        subscription = null;
+      }
+      subscription ??= await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
-      const subJson = subscription.toJSON() as {
-        endpoint?: string;
-        keys?: { p256dh?: string; auth?: string };
-      };
 
-      const save = await fetch("/api/admin/notifications/push/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          endpoint: subJson.endpoint ?? "",
-          p256dh: subJson.keys?.p256dh ?? "",
-          auth: subJson.keys?.auth ?? "",
-          userAgent: navigator.userAgent,
-        }),
-      });
+      const save = await saveSubscription(subscription);
       if (!save.ok) {
         if (save.status === 401) {
           setErrorMessage(
@@ -214,14 +267,14 @@ export function AdminPushNotificationToggle() {
             payment status changes, even when the admin panel is closed.
           </p>
         </div>
-        {state === "granted" || state === "default" ? (
+        {state === "granted" || state === "default" || state === "error" ? (
           <button
             type="button"
             onClick={state === "granted" ? disable : enable}
             disabled={busy}
             className="shrink-0 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
-            {state === "granted" ? "Disable" : "Enable"}
+            {state === "granted" ? "Disable" : state === "error" ? "Retry" : "Enable"}
           </button>
         ) : null}
       </div>

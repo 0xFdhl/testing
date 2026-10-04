@@ -60,6 +60,14 @@ function generateExternalId(): string {
   return `ORD-${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 12)}`;
 }
 
+async function checkoutRateLimitExceeded(userId: string): Promise<boolean> {
+  const oneMinuteAgo = new Date(Date.now() - 60_000);
+  const recentOrders = await prisma.order.count({
+    where: { userId, createdAt: { gte: oneMinuteAgo } },
+  });
+  return recentOrders >= 5;
+}
+
 async function resolveLineItems(
   items: Array<{ productSlug: string; size: OrderLineItem["size"]; quantity: number }>,
 ): Promise<{ lineItems: OrderLineItem[]; amount: number } | { error: string }> {
@@ -179,7 +187,7 @@ async function processCheckout(
       invoiceUrl: session.url,
     });
 
-    void emitOrderNotification(
+    await emitOrderNotification(
       {
         externalId,
         userId,
@@ -238,6 +246,9 @@ export async function createCheckoutOrder(
   });
   const cached = checkIdempotency<CheckoutActionState>(idemKey);
   if (cached.hit) return cached.result;
+  if (await checkoutRateLimitExceeded(userId)) {
+    return { ok: false, error: "Terlalu banyak percobaan checkout. Coba lagi sebentar." };
+  }
 
   const resolved = await resolveLineItems([
     {
@@ -315,6 +326,9 @@ export async function createCartCheckoutOrder(
   });
   const cached = checkIdempotency<CheckoutActionState>(idemKey);
   if (cached.hit) return cached.result;
+  if (await checkoutRateLimitExceeded(userId)) {
+    return { ok: false, error: "Terlalu banyak percobaan checkout. Coba lagi sebentar." };
+  }
 
   const resolved = await resolveLineItems(parsed.data.items);
   if ("error" in resolved) {

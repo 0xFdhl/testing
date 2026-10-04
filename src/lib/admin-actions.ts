@@ -11,7 +11,6 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
-import { emitOrderNotification, notificationEventForStatus } from "@/lib/notifications/emit";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { setXenditMode } from "@/lib/xendit/config";
@@ -270,34 +269,25 @@ export async function updateOrderStatusAction(
   if (status === "CANCELLED") updateData.cancelledAt = now;
 
   try {
-    await prisma.order.update({
-      where: { externalId },
-      data: updateData,
-    });
+    const existing = await prisma.order.findUnique({ where: { externalId } });
+    if (!existing) return { success: false, error: "Order not found" };
+    if (existing.status !== "PENDING") {
+      return {
+        success: false,
+        error: "A completed, expired, or cancelled order cannot be changed.",
+      };
+    }
 
-    const event = notificationEventForStatus(status);
-    if (event) {
-      const order = await prisma.order.findUnique({
-        where: { externalId },
-        select: {
-          externalId: true,
-          userId: true,
-          customerName: true,
-          amount: true,
-          status: true,
-        },
-      });
-      if (order) {
-        await emitOrderNotification(
-          {
-            externalId: order.externalId,
-            userId: order.userId ?? undefined,
-            customerName: order.customerName,
-            amount: order.amount,
-            status: order.status,
-          },
-          event,
-        );
+    if (status !== "PENDING") {
+      const { transitionOrderStatus } = await import("@/lib/orders");
+      const changed = await transitionOrderStatus(
+        externalId,
+        "PENDING",
+        status,
+        updateData,
+      );
+      if (!changed) {
+        return { success: false, error: "Order status changed. Refresh and try again." };
       }
     }
 
