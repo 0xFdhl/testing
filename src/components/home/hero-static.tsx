@@ -18,8 +18,21 @@ export function HeroStatic() {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, "-45svh"]);
-  const titleScale = useTransform(scrollYProgress, [0, 1], [1, smallTitleScale]);
+  const titleY = useTransform(
+    scrollYProgress,
+    [0, 0.12, 1],
+    [0, "-45svh", "-45svh"],
+  );
+  const titleScale = useTransform(
+    scrollYProgress,
+    [0, 0.12, 1],
+    [1, smallTitleScale, smallTitleScale],
+  );
+  const titleOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.1, 0.13, 1],
+    [1, 1, 0, 0],
+  );
   const cueOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
 
   useEffect(() => {
@@ -62,6 +75,7 @@ export function HeroStatic() {
           style={{
             y: prefersReducedMotion ? 0 : titleY,
             scale: prefersReducedMotion ? 1 : titleScale,
+            opacity: prefersReducedMotion ? 1 : titleOpacity,
           }}
         >
           <Link
