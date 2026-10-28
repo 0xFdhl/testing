@@ -151,7 +151,7 @@ function AnimatedNavbarLogo({
 
   return (
     <motion.span
-      className={cn("relative shrink-0 select-none", className)}
+      className={cn("relative shrink-0 select-none transition-opacity duration-300 ease-out", className)}
       style={{
         opacity: isHeroLayout ? (pastHero ? 1 : 0) : 1,
       }}
@@ -219,8 +219,8 @@ export function Navbar({
 
   const pastHeroOpacity = useTransform(smoothScrollY, (y) => {
     if (pathnameRef.current !== "/") return 0;
-    const start = heroHeight * 0.08;
-    const end = heroHeight * 0.14;
+    const start = heroHeight * 0.62;
+    const end = heroHeight * 0.7;
     if (y <= start) return 0;
     if (y >= end) return 1;
     const t = (y - start) / (end - start);
@@ -296,8 +296,8 @@ export function Navbar({
       }
       setScrolled(window.scrollY > 14);
       if (isHeroLayout && pathname === "/") {
-        const start = window.innerHeight * 0.08;
-        const end = window.innerHeight * 0.14;
+        const start = window.innerHeight * 0.62;
+        const end = window.innerHeight * 0.7;
         const y = window.scrollY;
         const blend =
           y <= start ? 0 : y >= end ? 1 : (y - start) / (end - start);
