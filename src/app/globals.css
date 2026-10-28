@@ -38,13 +38,6 @@ html {
     scroll-behavior: auto;
   }
 
-  html.home-scroll-snap {
-    scroll-snap-type: none;
-  }
-}
-
-html.home-scroll-snap {
-  scroll-snap-type: y proximity;
 }
 
 body {

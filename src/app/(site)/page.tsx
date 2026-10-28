@@ -1,5 +1,4 @@
 import { HeroStatic } from "@/components/home/hero-static";
-import { HomeScrollSnap } from "@/components/home/home-scroll-snap";
 import { NewArrivals } from "@/components/home/new-arrivals";
 import { FeaturedBanner } from "@/components/home/featured-banner";
 import { Navbar } from "@/components/layout/navbar";
@@ -12,7 +11,6 @@ export default async function HomePage() {
 
   return (
     <main id="main-content" className="relative bg-white">
-      <HomeScrollSnap />
       <Navbar variant="transparent" layout="hero" />
       <HeroStatic />
       <div className="relative bg-white">

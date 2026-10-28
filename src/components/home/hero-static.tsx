@@ -52,7 +52,7 @@ export function HeroStatic() {
     <section
       ref={sectionRef}
       aria-label="varcasvi_ — discover the collection"
-      className="relative h-[190svh] w-full shrink-0 snap-start snap-always bg-black"
+      className="relative h-[190svh] w-full shrink-0 bg-black"
     >
       <div className="sticky top-0 h-svh w-full overflow-hidden bg-black">
         <Image
