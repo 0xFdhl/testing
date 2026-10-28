@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { heroSlides } from "@/config/assets";
 
@@ -18,22 +24,27 @@ export function HeroStatic() {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 18,
+    mass: 0.4,
+  });
   const titleY = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.7, 1],
     [0, "-45svh", "-45svh"],
   );
   const titleScale = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.7, 1],
     [1, smallTitleScale, smallTitleScale],
   );
   const titleOpacity = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.66, 0.76, 1],
     [1, 1, 0, 0],
   );
-  const cueOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+  const cueOpacity = useTransform(smoothProgress, [0, 0.12], [1, 0]);
 
   useEffect(() => {
     const measureTitle = () => {
