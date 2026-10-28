@@ -14,11 +14,5 @@ export const EASE_RISE = easeOut;
 export const EASE_SETTLE = easeIn;
 export const EASE_SYMMETRIC = easeInOut;
 
-/**
- * Scroll-follow springs — ζ ≈ 0.85 (underdamped-critical band).
- * OPENING: k=90, m=0.8, c=15 → ζ≈0.88, settle ~440ms
- * SCROLL:  k=110, m=0.75, c=15 → ζ≈0.83, settle ~390ms
- * (Previous damping=28 gave ζ≈1.6 — overdamped, felt laggy behind finger.)
- */
-export const OPENING_SCROLL_SPRING = { stiffness: 90, damping: 15, mass: 0.8 };
+/** Scroll-follow spring — ζ ≈ 0.83 (underdamped-critical band). */
 export const NAVBAR_SCROLL_SPRING = { stiffness: 110, damping: 15, mass: 0.75 };
