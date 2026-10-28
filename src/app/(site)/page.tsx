@@ -3,6 +3,7 @@ import { HomeScrollSnap } from "@/components/home/home-scroll-snap";
 import { OpeningOverlay } from "@/components/home/opening-overlay";
 import { OpeningProvider } from "@/components/home/opening-provider";
 import { NewArrivals } from "@/components/home/new-arrivals";
+import { FeaturedBanner } from "@/components/home/featured-banner";
 import { Navbar } from "@/components/layout/navbar";
 import { getNewArrivals } from "@/lib/products/db";
 
@@ -22,8 +23,9 @@ export default async function HomePage() {
         <Navbar variant="transparent" layout="hero" />
       </OpeningProvider>
       <HeroStatic />
-      <div className="relative flex min-h-[100svh] snap-start snap-always flex-col bg-white">
-        <NewArrivals products={newArrivalProducts} />
+      <div className="relative bg-white">
+        <NewArrivals products={newArrivalProducts.slice(0, 5)} />
+        <FeaturedBanner products={newArrivalProducts.slice(5, 15)} />
       </div>
     </main>
   );

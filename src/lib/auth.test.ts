@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import * as auth from "@/lib/auth";
+import { SignJWT } from "jose";
+import { createHmac } from "node:crypto";
+
+const { findUnique, queryRaw, deleteMany } = vi.hoisted(() => ({ findUnique: vi.fn(), queryRaw: vi.fn(), deleteMany: vi.fn() }));
+vi.mock("@/lib/prisma", () => ({ prisma: { adminUser: { findUnique }, authThrottle: { deleteMany }, $queryRaw: queryRaw } }));
 
 const SECRET = "test-jwt-secret-very-long-and-secure-xxxxxxxxxxxx";
 
@@ -8,6 +13,7 @@ const session = {
   email: "admin@yourbrand.com",
   name: "Admin",
   role: "ADMIN" as const,
+  credentialVersion: createHmac("sha256", SECRET).update("hash-before-rotation").digest("hex"),
 };
 
 describe("auth: password hashing", () => {
@@ -28,6 +34,8 @@ describe("auth: password hashing", () => {
 describe("auth: JWT session tokens", () => {
   beforeEach(() => {
     vi.stubEnv("ADMIN_JWT_SECRET", SECRET);
+    findUnique.mockResolvedValue({ id: session.sub, ...session, passwordHash: "hash-before-rotation" });
+    queryRaw.mockResolvedValue([{ attempts: 1 }]);
   });
 
   afterEach(() => {
@@ -37,7 +45,7 @@ describe("auth: JWT session tokens", () => {
   it("round-trips a session token", async () => {
     const token = await auth.createSessionToken(session);
     const parsed = await auth.verifySessionToken(token);
-    expect(parsed).toEqual(session);
+    expect(parsed).toEqual({ sub: session.sub, email: session.email, name: session.name, role: session.role });
   });
 
   it("returns null for a tampered token", async () => {
@@ -57,12 +65,49 @@ describe("auth: JWT session tokens", () => {
     expect(await auth.verifySessionToken(token)).toBeNull();
   });
 
-  it("normalizes unknown role to ADMIN", async () => {
-    // @ts-expect-error: intentionally invalid role
-    const token = await auth.createSessionToken({ ...session, role: "WEIRD" });
-    // verifySessionToken maps anything non-SUPERADMIN to ADMIN
-    const parsed = await auth.verifySessionToken(token);
-    expect(parsed?.role).toBe("ADMIN");
+  it("rejects sessions after password rotation", async () => {
+    const token = await auth.createSessionToken(session);
+    findUnique.mockResolvedValue({ ...session, passwordHash: "hash-after-rotation" });
+    expect(await auth.verifySessionToken(token)).toBeNull();
+  });
+
+  it("rejects password rotation between authentication and token issuance", async () => {
+    findUnique.mockResolvedValue({ ...session, passwordHash: "new-hash" });
+    await expect(auth.createSessionToken(session)).rejects.toThrow("credentials changed");
+  });
+
+  it("enforces the shared login limit before password verification", async () => {
+    queryRaw.mockResolvedValue([{ attempts: 6 }]);
+    expect(await auth.authenticateAdmin(session.email, "password")).toBeNull();
+    expect(queryRaw).toHaveBeenCalled();
+  });
+
+  it("clears the failed-attempt limiter after a successful login", async () => {
+    await expect(auth.authenticateAdmin(session.email, "not-the-password")).resolves.toBeNull();
+    // Reuse a real bcrypt hash so this verifies the success path.
+    findUnique.mockResolvedValue({ id: session.sub, ...session, passwordHash: await auth.hashPassword("right-password") });
+    await expect(auth.authenticateAdmin(session.email, "right-password")).resolves.toMatchObject({ sub: session.sub });
+    expect(deleteMany).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects deleted accounts", async () => {
+    const token = await auth.createSessionToken(session);
+    findUnique.mockResolvedValue(null);
+    expect(await auth.verifySessionToken(token)).toBeNull();
+  });
+
+  it("uses the current database role instead of the signed role", async () => {
+    findUnique.mockResolvedValue({ ...session, role: "SUPERADMIN", passwordHash: "hash-before-rotation" });
+    const token = await auth.createSessionToken(session);
+    findUnique.mockResolvedValue({ ...session, passwordHash: "hash-before-rotation" });
+    expect((await auth.verifySessionToken(token))?.role).toBe("ADMIN");
+  });
+
+  it("rejects legacy tokens without credential binding", async () => {
+    const token = await new SignJWT({ email: session.email, role: "SUPERADMIN" })
+      .setSubject(session.sub).setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1h").sign(new TextEncoder().encode(SECRET));
+    expect(await auth.verifySessionToken(token)).toBeNull();
   });
 
   it("throws when ADMIN_JWT_SECRET is missing", async () => {

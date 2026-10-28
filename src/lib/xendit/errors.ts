@@ -20,15 +20,6 @@ export class XenditError extends Error {
 export function toCheckoutErrorMessage(err: unknown): string {
   if (err instanceof XenditError) return err.userMessage;
 
-  if (err instanceof Error) {
-    if (err.message.includes("is not configured")) {
-      return (
-        "Payment gateway belum dikonfigurasi. Buat file .env.local di root project, " +
-        "copy isi dari .env.example, lalu isi XENDIT_TEST_SECRET_KEY dari Xendit Dashboard " +
-        "(Settings → API Keys → Test). Restart dev server setelah simpan."
-      );
-    }
-  }
-
+  // Do not expose deployment or credential configuration to shoppers.
   return "Gagal membuat invoice pembayaran. Coba lagi ya.";
 }

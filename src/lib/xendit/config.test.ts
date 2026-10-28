@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   getXenditMode,
   isXenditTestMode,
-  setXenditMode,
   getXenditSecretKey,
   getXenditPublicKey,
   getXenditWebhookToken,
@@ -11,7 +10,6 @@ import {
 
 describe("xendit config", () => {
   beforeEach(() => {
-    setXenditMode(null as never);
     vi.stubEnv("XENDIT_TEST_SECRET_KEY", "xnd_test_abc");
     vi.stubEnv("XENDIT_LIVE_SECRET_KEY", "xnd_live_xyz");
     vi.stubEnv("XENDIT_TEST_PUBLIC_KEY", "xnd_test_pub");
@@ -19,7 +17,6 @@ describe("xendit config", () => {
   });
 
   afterEach(() => {
-    setXenditMode(null as never);
     vi.unstubAllEnvs();
   });
 
@@ -39,10 +36,6 @@ describe("xendit config", () => {
       expect(getXenditMode()).toBe("test");
     });
 
-    it("uses cached mode set via setXenditMode", () => {
-      setXenditMode("live");
-      expect(getXenditMode()).toBe("live");
-    });
   });
 
   describe("isXenditTestMode", () => {

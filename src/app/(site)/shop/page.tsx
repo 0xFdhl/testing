@@ -3,11 +3,11 @@ import { Navbar } from "@/components/layout/navbar";
 import { ProductGrid } from "@/components/shop/product-grid";
 import { ShopBanner } from "@/components/shop/shop-banner";
 import { getAllProducts } from "@/lib/products/db";
-import { isValidShopFilterCategory, normalizeSearchQuery } from "@/lib/products";
+import { normalizeSearchQuery } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Catalog — All Products",
-  description: "Browse tees and Levi's 529 Bootcut from yourbrand.",
+  description: "Browse the full varcasvi_ collection.",
 };
 
 type ShopPageProps = {
@@ -16,12 +16,15 @@ type ShopPageProps = {
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams;
-  const initialCategory = isValidShopFilterCategory(params.category)
-    ? params.category
-    : "all";
   const initialSearchQuery =
     typeof params.q === "string" ? normalizeSearchQuery(params.q) : "";
   const allProducts = await getAllProducts();
+  const requestedCategory = params.category;
+  const initialCategory =
+    requestedCategory === "all" ||
+    allProducts.some((product) => product.category === requestedCategory)
+      ? requestedCategory ?? "all"
+      : "all";
 
   return (
     <main id="main-content" className="min-h-screen bg-white pb-20 md:pb-0">

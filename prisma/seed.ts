@@ -119,23 +119,23 @@ const products = [
 ];
 
 async function main() {
+  if (process.env.NODE_ENV === "production") throw new Error("Demo seed is disabled in production");
   console.log("Seeding admin user...");
 
-  const adminEmail = "admin@yourbrand.com";
-  const adminPassword = "admin123";
-  const passwordHash = hashSync(adminPassword, 12);
-
-  await prisma.adminUser.upsert({
-    where: { email: adminEmail },
-    update: { passwordHash, name: "Super Admin" },
-    create: {
+  const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (adminEmail && !(await prisma.adminUser.findUnique({ where: { email: adminEmail } }))) {
+    if (!adminPassword || adminPassword.length < 20 || Buffer.byteLength(adminPassword) > 72) {
+      throw new Error("Set a unique SEED_ADMIN_PASSWORD of at least 20 characters (maximum 72 bytes)");
+    }
+    await prisma.adminUser.create({ data: {
       email: adminEmail,
-      passwordHash,
+      passwordHash: hashSync(adminPassword, 12),
       name: "Super Admin",
       role: "SUPERADMIN",
-    },
-  });
-  console.log(`  ✓ Admin user — ${adminEmail} / ${adminPassword}`);
+    } });
+  }
+  console.log("Admin bootstrap complete; existing credentials preserved.");
 
   console.log("Seeding products...");
 

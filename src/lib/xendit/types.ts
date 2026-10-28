@@ -27,6 +27,7 @@ export type CreateInvoiceInput = {
 };
 
 export type XenditInvoice = {
+  currency: string;
   id: string;
   external_id: string;
   status: XenditInvoiceStatus;

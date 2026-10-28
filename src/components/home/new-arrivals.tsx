@@ -23,12 +23,20 @@ export function NewArrivals({ products }: NewArrivalsProps) {
   }, []);
 
   return (
-    <section className="flex flex-1 flex-col bg-white px-4 py-10 sm:px-6 sm:py-12 md:px-12 md:py-16 lg:px-16">
-      <h2 className="mb-8 text-center text-sm font-bold italic tracking-[0.06em] text-black uppercase sm:mb-10 sm:text-base md:mb-12 md:text-lg">
-        NEW ARRIVAL
+    <section className="flex flex-col bg-white px-[5vw] pb-[8vh] pt-[13vh] text-black">
+      <h2 className="mb-9 flex w-fit flex-col text-[clamp(2rem,4vw,3.5rem)] font-medium leading-[0.82] tracking-[-0.075em] sm:mb-12 md:mb-14">
+        <span>New</span>
+        <span className="flex items-end gap-1.5">
+          Arrival
+          <span
+            aria-hidden
+            className="mb-[0.16em] h-[0.24em] w-[0.24em] bg-black"
+            style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0)" }}
+          />
+        </span>
       </h2>
 
-      <div className="hidden gap-4 lg:grid lg:grid-cols-5 lg:gap-5">
+      <div className="hidden gap-4 lg:grid lg:grid-cols-5 lg:gap-6">
         {products.map((product) => (
           <NewArrivalCard key={product.id} product={product} />
         ))}

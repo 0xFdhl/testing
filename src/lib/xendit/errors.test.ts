@@ -35,9 +35,9 @@ describe("toCheckoutErrorMessage", () => {
     expect(toCheckoutErrorMessage(err)).toBe("custom msg");
   });
 
-  it("returns setup hint when message indicates not configured", () => {
+  it("does not expose deployment setup hints", () => {
     const err = new Error("something is not configured bla");
-    expect(toCheckoutErrorMessage(err)).toContain(".env");
+    expect(toCheckoutErrorMessage(err)).not.toContain(".env");
   });
 
   it("returns generic fallback for other errors", () => {

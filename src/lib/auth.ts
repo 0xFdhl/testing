@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { createHmac } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -14,10 +15,12 @@ export type AdminSession = {
   role: "ADMIN" | "SUPERADMIN";
 };
 
+type AuthenticatedAdmin = AdminSession & { credentialVersion: string };
+
 function getJwtSecret(): Uint8Array {
   const secret = process.env.ADMIN_JWT_SECRET;
-  if (!secret) {
-    throw new Error("ADMIN_JWT_SECRET environment variable is required");
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    throw new Error("ADMIN_JWT_SECRET must contain at least 32 bytes");
   }
   return new TextEncoder().encode(secret);
 }
@@ -34,12 +37,16 @@ export async function verifyPassword(
 }
 
 export async function createSessionToken(
-  user: AdminSession,
+  user: AuthenticatedAdmin,
 ): Promise<string> {
+  const current = await prisma.adminUser.findUnique({ where: { id: user.sub } });
+  if (!current) throw new Error("Admin account no longer exists");
+  if (user.credentialVersion !== credentialVersion(current.passwordHash)) throw new Error("Admin credentials changed during login");
   return new SignJWT({
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    email: current.email,
+    name: current.name,
+    role: current.role,
+    credentialVersion: credentialVersion(current.passwordHash),
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(user.sub)
@@ -48,18 +55,28 @@ export async function createSessionToken(
     .sign(getJwtSecret());
 }
 
+function credentialVersion(passwordHash: string): string {
+  return createHmac("sha256", getJwtSecret()).update(passwordHash).digest("hex");
+}
+
+function loginThrottleKey(email: string): string {
+  return `login:${createHmac("sha256", getJwtSecret()).update(email).digest("hex")}`;
+}
+
 export async function verifySessionToken(
   token: string,
 ): Promise<AdminSession | null> {
   try {
-    const { payload } = await jwtVerify(token, getJwtSecret());
+    const { payload } = await jwtVerify(token, getJwtSecret(), { algorithms: ["HS256"] });
     if (!payload.sub || typeof payload.email !== "string") return null;
+    const current = await prisma.adminUser.findUnique({ where: { id: payload.sub } });
+    if (!current || payload.credentialVersion !== credentialVersion(current.passwordHash)) return null;
 
     return {
       sub: payload.sub,
-      email: payload.email,
-      name: typeof payload.name === "string" ? payload.name : "",
-      role: payload.role === "SUPERADMIN" ? "SUPERADMIN" : "ADMIN",
+      email: current.email,
+      name: current.name,
+      role: current.role,
     };
   } catch {
     return null;
@@ -109,9 +126,23 @@ export async function requireAdminApi(): Promise<AdminSession | Response> {
 export async function authenticateAdmin(
   email: string,
   password: string,
-): Promise<AdminSession | null> {
+): Promise<AuthenticatedAdmin | null> {
+  if (email.length > 254 || !password || Buffer.byteLength(password) > 72) return null;
+  const normalizedEmail = email.toLowerCase().trim();
+  const key = loginThrottleKey(normalizedEmail);
+  // Atomically count every credential attempt without revealing whether the
+  // account exists. Successful sign-in clears this particular limiter below.
+  const [limit] = await prisma.$queryRaw<Array<{ attempts: number }>>`
+    INSERT INTO "AuthThrottle" ("key", "attempts", "resetAt")
+    VALUES (${key}, 1, NOW() + INTERVAL '15 minutes')
+    ON CONFLICT ("key") DO UPDATE SET
+      "attempts" = CASE WHEN "AuthThrottle"."resetAt" <= NOW() THEN 1 ELSE LEAST("AuthThrottle"."attempts" + 1, 1000000) END,
+      "resetAt" = CASE WHEN "AuthThrottle"."resetAt" <= NOW() THEN NOW() + INTERVAL '15 minutes' ELSE "AuthThrottle"."resetAt" END
+    RETURNING "attempts"
+  `;
+  if (!limit || limit.attempts > 5) return null;
   const user = await prisma.adminUser.findUnique({
-    where: { email: email.toLowerCase().trim() },
+    where: { email: normalizedEmail },
   });
 
   if (!user) {
@@ -123,11 +154,14 @@ export async function authenticateAdmin(
     return null;
   }
 
+  await prisma.authThrottle.deleteMany({ where: { key } });
+
   return {
     sub: user.id,
     email: user.email,
     name: user.name,
     role: user.role,
+    credentialVersion: credentialVersion(user.passwordHash),
   };
 }
 

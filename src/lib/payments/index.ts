@@ -1,12 +1,11 @@
 import "server-only";
-import { createInvoice, getInvoice, isPaidStatus } from "@/lib/xendit";
-import { createCheckoutSession, getSession } from "@/lib/stripe";
+import { createInvoice } from "@/lib/xendit";
+import { createCheckoutSession, isStripeTestMode } from "@/lib/stripe";
 import { idrToUsdCents } from "./currency";
 import type {
   CreateCheckoutInput,
   CheckoutSession,
   Provider,
-  ProviderStatus,
 } from "./types";
 
 export async function createCheckout(
@@ -33,6 +32,8 @@ export async function createCheckout(
       failureRedirectUrl: input.cancelUrl,
     });
 
+    if (!invoice.id || invoice.external_id !== input.externalId || invoice.amount !== input.amountMinor || invoice.currency !== input.currency) throw new Error("Xendit invoice does not match checkout");
+
     return {
       provider: "xendit",
       sessionId: invoice.id,
@@ -53,6 +54,8 @@ export async function createCheckout(
     cancelUrl: input.cancelUrl,
   });
 
+  if (!session.id || session.metadata?.externalId !== input.externalId || session.amount_total !== input.amountMinor || session.currency.toUpperCase() !== input.currency || session.livemode !== !isStripeTestMode()) throw new Error("Stripe session does not match checkout");
+
   return {
     provider: "stripe",
     sessionId: session.id,
@@ -60,23 +63,6 @@ export async function createCheckout(
     status: "PENDING",
     expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
   };
-}
-
-export async function getProviderStatus(
-  provider: Provider,
-  gatewayId: string,
-): Promise<ProviderStatus> {
-  if (provider === "xendit") {
-    const invoice = await getInvoice(gatewayId);
-    if (isPaidStatus(invoice.status)) return "PAID";
-    if (invoice.status === "EXPIRED") return "EXPIRED";
-    return "PENDING";
-  }
-
-  const session = await getSession(gatewayId);
-  if (session.payment_status === "paid") return "PAID";
-  if (session.status === "expired") return "EXPIRED";
-  return "PENDING";
 }
 
 export function calculateAmountMinor(provider: Provider, amountIdr: number): number {
@@ -90,4 +76,4 @@ export function resolveCurrency(provider: Provider): "IDR" | "USD" {
   return provider === "stripe" ? "USD" : "IDR";
 }
 
-export type { CreateCheckoutInput, CheckoutSession, Provider, ProviderStatus } from "./types";
+export type { CreateCheckoutInput, CheckoutSession, Provider } from "./types";

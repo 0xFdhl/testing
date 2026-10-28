@@ -19,8 +19,7 @@ async function parseXenditError(res: Response): Promise<XenditError> {
   let userMessage = "Gateway pembayaran menolak request. Coba lagi ya.";
 
   if (res.status === 401) {
-    userMessage =
-      "API Key Xendit tidak valid. Pastikan pakai Test Secret Key di .env (bukan Live).";
+    userMessage = "Gateway pembayaran tidak dapat diproses. Coba lagi beberapa saat.";
   } else if (res.status === 400) {
     userMessage = "Data pembayaran tidak valid. Periksa jumlah dan detail order.";
   }
@@ -62,6 +61,7 @@ export async function createInvoice(
       payment_methods: [...paymentMethods],
     }),
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
 
   if (!res.ok) {
@@ -74,9 +74,10 @@ export async function createInvoice(
 export async function getInvoice(invoiceId: string): Promise<XenditInvoice> {
   const secretKey = getXenditSecretKey();
 
-  const res = await fetch(`${XENDIT_API_BASE}/v2/invoices/${invoiceId}`, {
+  const res = await fetch(`${XENDIT_API_BASE}/v2/invoices/${encodeURIComponent(invoiceId)}`, {
     headers: { Authorization: authHeader(secretKey) },
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
 
   if (!res.ok) {

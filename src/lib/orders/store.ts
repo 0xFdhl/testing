@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { emitOrderNotification, notificationEventForStatus } from "@/lib/notifications/emit";
-import type { CreateOrderInput, Order, UpdateOrderInput } from "./types";
+import type { Order, UpdateOrderInput } from "./types";
 import { addItemsToStock, getRestockLineItems } from "./stock";
 
 function toOrder(row: { externalId: string; userId: string | null; xenditInvoiceId: string | null; gatewayInvoiceId: string | null; invoiceUrl: string | null; provider: string; currency: string; status: string; lineItems: unknown; amount: number; customerName: string; customerEmail: string; customerPhone: string; createdAt: Date; paidAt: Date | null; expiredAt: Date | null; cancelledAt: Date | null }): Order {
@@ -25,24 +25,6 @@ function toOrder(row: { externalId: string; userId: string | null; xenditInvoice
   };
 }
 
-export async function createOrder(input: CreateOrderInput): Promise<Order> {
-  const row = await prisma.order.create({
-    data: {
-      externalId: input.externalId,
-      userId: input.userId,
-      lineItems: input.lineItems as object,
-      amount: input.amount,
-      customerName: input.customerName,
-      customerEmail: input.customerEmail,
-      customerPhone: input.customerPhone,
-      provider: input.provider ?? "xendit",
-      currency: input.currency ?? "IDR",
-      status: "PENDING",
-    },
-  });
-  return toOrder(row);
-}
-
 export async function getOrderByExternalId(
   externalId: string,
   userId?: string,
@@ -54,31 +36,6 @@ export async function getOrderByExternalId(
   return toOrder(row);
 }
 
-export async function updateOrderByExternalId(
-  externalId: string,
-  patch: UpdateOrderInput,
-  userId?: string,
-): Promise<Order | null> {
-  const data: Record<string, unknown> = {};
-  if ("xenditInvoiceId" in patch) data.xenditInvoiceId = patch.xenditInvoiceId;
-  if ("gatewayInvoiceId" in patch) data.gatewayInvoiceId = patch.gatewayInvoiceId;
-  if ("invoiceUrl" in patch) data.invoiceUrl = patch.invoiceUrl;
-  if ("provider" in patch) data.provider = patch.provider;
-  if ("currency" in patch) data.currency = patch.currency;
-  if ("status" in patch) data.status = patch.status;
-  if ("paidAt" in patch) data.paidAt = patch.paidAt;
-  if ("expiredAt" in patch) data.expiredAt = patch.expiredAt;
-  if ("cancelledAt" in patch) data.cancelledAt = patch.cancelledAt;
-
-  const where = userId ? { externalId, userId } : { externalId };
-  if (userId) {
-    const updated = await prisma.order.updateMany({ where, data }).catch(() => ({ count: 0 }));
-    if (updated.count === 0) return null;
-  }
-  const row = await prisma.order.update({ where: { externalId }, data }).catch(() => null);
-  return row ? toOrder(row) : null;
-}
-
 export async function transitionOrderStatus(
   externalId: string,
   from: Order["status"],
@@ -87,6 +44,7 @@ export async function transitionOrderStatus(
   userId?: string,
 ): Promise<boolean> {
   const data: Record<string, unknown> = { status: to };
+  if (to !== "PENDING") data.checkoutKey = null;
   if (patch.paidAt) data.paidAt = patch.paidAt;
   if (patch.expiredAt) data.expiredAt = patch.expiredAt;
   if (patch.cancelledAt) data.cancelledAt = patch.cancelledAt;

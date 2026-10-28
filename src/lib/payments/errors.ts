@@ -20,15 +20,6 @@ export class PaymentError extends Error {
 export function toCheckoutErrorMessage(err: unknown): string {
   if (err instanceof PaymentError) return err.userMessage;
 
-  if (err instanceof Error) {
-    if (err.message.includes("is not configured")) {
-      return (
-        "Payment gateway belum dikonfigurasi. Buat file .env.local di root project, " +
-        "copy isi dari .env.example, lalu isi secret key yang sesuai. " +
-        "Restart dev server setelah simpan."
-      );
-    }
-  }
-
+  // Configuration details belong in server logs, never in a shopper response.
   return "Gagal membuat invoice pembayaran. Coba lagi ya.";
 }

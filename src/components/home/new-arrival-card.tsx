@@ -16,7 +16,7 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
         className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={product.name}
       >
-        <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-transparent sm:rounded-lg">
+        <div className="relative aspect-square overflow-hidden bg-white">
           <Image
             src={product.image}
             alt={product.name}
@@ -26,11 +26,11 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
           />
         </div>
 
-        <div className="mt-3 space-y-1.5 sm:mt-4">
-          <p className="text-[11px] font-semibold tracking-[0.02em] text-black sm:text-xs">
+        <div className="mt-3 space-y-0.5 sm:mt-4">
+          <p className="text-[11px] font-normal leading-tight tracking-[-0.02em] text-black sm:text-xs">
             {product.name}
           </p>
-          <p className="text-[clamp(11px,1vw+8px,12px)] text-neutral-400">
+          <p className="text-[10px] leading-tight text-neutral-500 sm:text-[11px]">
             {formatIdr(product.price)}
           </p>
         </div>

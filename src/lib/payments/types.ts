@@ -22,5 +22,3 @@ export type CheckoutSession = {
   status: "PENDING";
   expiresAt?: Date;
 };
-
-export type ProviderStatus = "PENDING" | "PAID" | "EXPIRED";

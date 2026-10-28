@@ -2,14 +2,7 @@ import "server-only";
 
 export type XenditMode = "test" | "live";
 
-let cachedMode: XenditMode | null = null;
-
-export function setXenditMode(mode: XenditMode): void {
-  cachedMode = mode;
-}
-
 export function getXenditMode(): XenditMode {
-  if (cachedMode) return cachedMode;
   const mode = process.env.XENDIT_MODE ?? "test";
   return mode === "live" ? "live" : "test";
 }

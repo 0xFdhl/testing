@@ -33,18 +33,6 @@ export type Order = {
   cancelledAt?: Date;
 };
 
-export type CreateOrderInput = {
-  externalId: string;
-  userId?: string;
-  lineItems: OrderLineItem[];
-  amount: number;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  provider?: Provider;
-  currency?: OrderCurrency;
-};
-
 export type UpdateOrderInput = {
   status?: OrderStatus;
   xenditInvoiceId?: string;

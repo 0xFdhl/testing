@@ -20,7 +20,7 @@ async function parseStripeError(res: Response): Promise<StripeError> {
   let userMessage = "Gateway pembayaran menolak request. Coba lagi ya.";
 
   if (res.status === 401) {
-    userMessage = "API Key Stripe tidak valid. Periksa STRIPE_SECRET_KEY di .env.local.";
+    userMessage = "Gateway pembayaran tidak dapat diproses. Coba lagi beberapa saat.";
   } else if (res.status === 400) {
     userMessage = "Data pembayaran tidak valid. Periksa jumlah dan detail order.";
   }
@@ -62,6 +62,10 @@ export type CreateStripeSessionInput = {
 export async function createCheckoutSession(
   input: CreateStripeSessionInput,
 ): Promise<StripeCheckoutSession> {
+  const total = input.items.reduce((sum, item) => sum + item.unitPriceMinor * item.quantity, 0);
+  if (!input.items.length || input.items.some((item) => !Number.isSafeInteger(item.quantity) || item.quantity <= 0 || !Number.isSafeInteger(item.unitPriceMinor) || item.unitPriceMinor <= 0) || !Number.isSafeInteger(total) || total <= 0 || total !== input.amountMinor) {
+    throw new Error("Stripe line items do not match the payment total");
+  }
   const key = getStripeSecretKey();
 
   const body = new URLSearchParams({
@@ -82,9 +86,11 @@ export async function createCheckoutSession(
     headers: {
       Authorization: authHeader(key),
       "Content-Type": "application/x-www-form-urlencoded",
+      "Idempotency-Key": input.externalId,
     },
     body: body.toString(),
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
 
   if (!res.ok) {
@@ -97,9 +103,10 @@ export async function createCheckoutSession(
 export async function getSession(sessionId: string): Promise<StripeCheckoutSession> {
   const key = getStripeSecretKey();
 
-  const res = await fetch(`${STRIPE_API_BASE}/v1/checkout/sessions/${sessionId}`, {
+  const res = await fetch(`${STRIPE_API_BASE}/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
     headers: { Authorization: authHeader(key) },
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
 
   if (!res.ok) {
@@ -110,29 +117,27 @@ export async function getSession(sessionId: string): Promise<StripeCheckoutSessi
 }
 
 export function verifyWebhookSignature(req: Request, rawBody: string): boolean {
-  const secret = getStripeWebhookSecret();
+  let secret: string;
+  try { secret = getStripeWebhookSecret(); } catch { return false; }
   const header = req.headers.get("stripe-signature");
   if (!header) return false;
 
   const parts = header.split(",");
   let timestamp = "";
-  let signature = "";
+  const signatures: string[] = [];
 
   for (const part of parts) {
-    const [key, value] = part.split("=");
+    const [key, value] = part.trim().split("=");
     if (key === "t") timestamp = value;
-    if (key === "v1") signature = value;
+    if (key === "v1" && /^[a-f0-9]{64}$/i.test(value)) signatures.push(value);
   }
 
-  if (!timestamp || !signature) return false;
+  if (!/^\d+$/.test(timestamp) || !signatures.length || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
 
   const signedPayload = `${timestamp}.${rawBody}`;
   const expected = crypto.createHmac("sha256", secret)
     .update(signedPayload)
     .digest();
 
-  const actual = Buffer.from(signature, "hex");
-
-  if (expected.length !== actual.length) return false;
-  return timingSafeEqual(expected, actual);
+  return signatures.some((signature) => timingSafeEqual(expected, Buffer.from(signature, "hex")));
 }

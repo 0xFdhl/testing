@@ -4,14 +4,11 @@ import { CatalogFilter } from "@/components/shop/catalog-filter";
 import { ProductCard } from "@/components/shop/product-card";
 import {
   normalizeSearchQuery,
-  productMatchesShopFilter,
-  shopCategoryFilters,
   type Product,
-  type ShopFilterCategory,
 } from "@/lib/products";
 
 type ProductGridProps = {
-  initialCategory?: ShopFilterCategory;
+  initialCategory?: string;
   initialSearchQuery?: string;
   products: Product[];
 };
@@ -21,12 +18,21 @@ export function ProductGrid({
   initialSearchQuery = "",
   products,
 }: ProductGridProps) {
-  const [category, setCategory] = useState<ShopFilterCategory>(initialCategory);
+  const [category, setCategory] = useState(initialCategory);
   const searchQuery = normalizeSearchQuery(initialSearchQuery);
+  const categories = useMemo(
+    () => [
+      { value: "all", label: "all" },
+      ...Array.from(new Set(products.map((product) => product.category)))
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => ({ value, label: value.toLowerCase() })),
+    ],
+    [products],
+  );
 
   const filtered = useMemo(() => {
-    const byCategory = products.filter((product) =>
-      productMatchesShopFilter(product, category),
+    const byCategory = products.filter(
+      (product) => category === "all" || product.category === category,
     );
     if (!searchQuery) return byCategory;
     const q = searchQuery.toLowerCase();
@@ -45,20 +51,21 @@ export function ProductGrid({
     });
   }, [category, searchQuery, products]);
 
-  const sectionTitle = searchQuery
-    ? `Results for "${searchQuery}"`
-    : category === "all"
-      ? "All Product"
-      : shopCategoryFilters.find((filter) => filter.value === category)?.label ??
-        "All Product";
+  const sectionTitle = searchQuery ? `Results for "${searchQuery}"` : null;
 
   return (
     <>
-      <CatalogFilter category={category} onCategoryChange={setCategory} />
-      <section className="bg-white px-4 pb-16 pt-2 sm:px-6 md:px-12 md:pb-20 lg:px-16">
-        <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-black uppercase sm:mb-6 sm:text-sm md:mb-8">
-          {sectionTitle}
-        </h2>
+      <CatalogFilter
+        category={category}
+        categories={categories}
+        onCategoryChange={setCategory}
+      />
+      <section className="bg-white px-[5vw] pb-16 pt-[4vh] sm:pb-20 md:pb-24">
+        {sectionTitle && (
+          <h2 className="mb-6 text-sm font-medium tracking-tight text-black sm:mb-8 sm:text-base">
+            {sectionTitle}
+          </h2>
+        )}
         {filtered.length === 0 ? (
           <p className="py-16 text-center text-sm text-black/50">
             {searchQuery
@@ -66,7 +73,7 @@ export function ProductGrid({
               : "No pieces in this category yet. Try another filter."}
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-4 sm:gap-x-3 sm:gap-y-8 md:grid-cols-5 md:gap-x-3 lg:grid-cols-6 lg:gap-x-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-14">
             {filtered.map((product, i) => (
               <ProductCard
                 key={product.id}

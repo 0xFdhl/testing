@@ -1,44 +1,91 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { heroSlides } from "@/config/assets";
 
-const HERO_BG = "/images/products/background/varcasi.webp";
+const BRAND = "varcasvi_";
 
 export function HeroStatic() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const [smallTitleScale, setSmallTitleScale] = useState(0.08);
+  const prefersReducedMotion = useReducedMotion();
   const slide = heroSlides[0];
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, "-45svh"]);
+  const titleScale = useTransform(scrollYProgress, [0, 1], [1, smallTitleScale]);
+  const cueOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+
+  useEffect(() => {
+    const measureTitle = () => {
+      const title = titleRef.current;
+      if (!title) return;
+      const fontSize = Number.parseFloat(window.getComputedStyle(title).fontSize);
+      if (fontSize > 0) setSmallTitleScale(Math.min(1, 20 / fontSize));
+    };
+
+    measureTitle();
+    window.addEventListener("resize", measureTitle);
+    return () => window.removeEventListener("resize", measureTitle);
+  }, []);
 
   return (
     <section
-      aria-label="Hero"
-      className="relative flex h-[110svh] min-h-[100svh] w-full shrink-0 snap-start snap-always items-center justify-center overflow-hidden bg-white"
+      ref={sectionRef}
+      aria-label="varcasvi_ — discover the collection"
+      className="relative h-[190svh] w-full shrink-0 snap-start snap-always bg-black"
     >
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 flex h-[40%] w-[50%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+      <div className="sticky top-0 h-svh w-full overflow-hidden bg-black">
         <Image
-          src={HERO_BG}
+          src={slide.src}
           alt=""
           aria-hidden
           fill
           priority
-          className="object-contain"
-          sizes="45vw"
-          quality={80}
-        />
-      </div>
-      <Link
-        href={slide.href ?? "#"}
-        className="relative z-10 block h-[70%] w-[80%] max-w-[1100px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        aria-label={`Shop ${slide.alt}`}
-      >
-        <Image
-          src={slide.src}
-          alt={slide.alt}
-          fill
-          priority
-          className="object-contain contrast-[1.14] brightness-[1.00] saturate-10"
+          className="object-cover object-center opacity-80"
           sizes="100vw"
           quality={90}
         />
-      </Link>
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.42)_0%,rgba(0,0,0,0.15)_42%,rgba(0,0,0,0.5)_100%)]"
+        />
+
+        <motion.div
+          className="absolute inset-0 z-10 flex items-center justify-center"
+          style={{
+            y: prefersReducedMotion ? 0 : titleY,
+            scale: prefersReducedMotion ? 1 : titleScale,
+          }}
+        >
+          <Link
+            href={slide.href ?? "/shop"}
+            aria-label={`Shop ${slide.alt}`}
+            className="rounded-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-8 focus-visible:ring-offset-black"
+          >
+            <h1 className="select-none whitespace-nowrap font-sans text-[clamp(3.5rem,22vw,22rem)] font-black leading-[0.78] tracking-[-0.095em]">
+              <span ref={titleRef} className="inline-block pr-[0.08em]">
+                {BRAND}
+              </span>
+            </h1>
+          </Link>
+        </motion.div>
+
+        <motion.div
+          aria-hidden
+          style={{ opacity: cueOpacity }}
+          className="absolute inset-x-0 bottom-10 z-20 flex flex-col items-center gap-3 text-[10px] font-semibold tracking-[0.28em] text-white/80 uppercase"
+        >
+          <span>Scroll to explore</span>
+          <span className="h-9 w-px bg-white/70" />
+        </motion.div>
+      </div>
     </section>
   );
 }

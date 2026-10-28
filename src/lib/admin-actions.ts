@@ -2,7 +2,6 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import type { OrderStatus } from "@/generated/prisma/enums";
 import {
   authenticateAdmin,
   clearSessionCookie,
@@ -12,8 +11,9 @@ import {
 } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
-import { checkRateLimit } from "@/lib/rate-limit";
-import { setXenditMode } from "@/lib/xendit/config";
+import { getXenditMode } from "@/lib/xendit/config";
+import { reconcilePayment } from "@/lib/payments/reconcile";
+import { processPaymentWebhook } from "@/lib/payments/webhooks";
 import {
   ImageValidationError,
   StorageConfigError,
@@ -46,11 +46,6 @@ export async function loginAction(
 
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  const rateLimit = checkRateLimit("admin-login", 5, 60_000);
-  if (!rateLimit.allowed) {
-    return { success: false, error: "Too many attempts. Try again later." };
   }
 
   const session = await authenticateAdmin(parsed.data.email, parsed.data.password);
@@ -255,41 +250,9 @@ export async function updateOrderStatusAction(
   }
 
   const { externalId, status } = parsed.data;
-  const now = new Date();
-
-  const updateData: {
-    status: OrderStatus;
-    paidAt?: Date;
-    expiredAt?: Date;
-    cancelledAt?: Date;
-  } = { status };
-
-  if (status === "PAID") updateData.paidAt = now;
-  if (status === "EXPIRED") updateData.expiredAt = now;
-  if (status === "CANCELLED") updateData.cancelledAt = now;
-
   try {
-    const existing = await prisma.order.findUnique({ where: { externalId } });
-    if (!existing) return { success: false, error: "Order not found" };
-    if (existing.status !== "PENDING") {
-      return {
-        success: false,
-        error: "A completed, expired, or cancelled order cannot be changed.",
-      };
-    }
-
-    if (status !== "PENDING") {
-      const { transitionOrderStatus } = await import("@/lib/orders");
-      const changed = await transitionOrderStatus(
-        externalId,
-        "PENDING",
-        status,
-        updateData,
-      );
-      if (!changed) {
-        return { success: false, error: "Order status changed. Refresh and try again." };
-      }
-    }
+    const verifiedStatus = await reconcilePayment(externalId);
+    if (verifiedStatus !== status) return { success: false, error: `Gateway confirms ${verifiedStatus}. Financial status cannot be overridden manually.` };
 
     await logAudit(session, "UPDATE_STATUS", "Order", externalId, { status });
     revalidatePath("/admin/orders");
@@ -310,22 +273,8 @@ export async function retryWebhookAction(eventId: string): Promise<ActionResult>
   }
 
   try {
-    const payload = event.payload as { external_id?: string; status?: string } | null;
-    if (!payload?.external_id || !payload?.status) {
-      return { success: false, error: "Invalid event payload" };
-    }
-
-    const { isPaidStatus } = await import("@/lib/xendit");
-    const { getOrderByExternalId, transitionOrderStatus } = await import("@/lib/orders");
-
-    const order = await getOrderByExternalId(payload.external_id);
-    if (order && order.status === "PENDING") {
-      if (isPaidStatus(payload.status as "PENDING" | "PAID" | "SETTLED" | "EXPIRED")) {
-        await transitionOrderStatus(payload.external_id, "PENDING", "PAID", { paidAt: new Date() });
-      } else if (payload.status === "EXPIRED") {
-        await transitionOrderStatus(payload.external_id, "PENDING", "EXPIRED", { expiredAt: new Date() });
-      }
-    }
+    if (!eventId.startsWith("stripe:") && !eventId.startsWith("xendit:")) return { success: false, error: "Legacy event requires manual provider reconciliation." };
+    await processPaymentWebhook(eventId.startsWith("stripe:") ? "stripe" : "xendit", event.payload);
 
     await prisma.webhookEvent.update({
       where: { eventId },
@@ -348,6 +297,7 @@ export async function updateSettingsAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const session = await requireAdmin();
+  if (session.role !== "SUPERADMIN") return { success: false, error: "SUPERADMIN required." };
   const parsed = settingsSchema.safeParse({
     xenditMode: formData.get("xenditMode"),
     appUrl: formData.get("appUrl"),
@@ -360,6 +310,7 @@ export async function updateSettingsAction(
   }
 
   const { xenditMode, appUrl, adminsCanEditPhotos } = parsed.data;
+  if (xenditMode !== getXenditMode()) return { success: false, error: "Payment mode is deployment configuration; it cannot be changed from the dashboard." };
 
   await prisma.appSetting.upsert({
     where: { key: "xendit_mode" },
@@ -388,7 +339,6 @@ export async function updateSettingsAction(
     });
   }
 
-  setXenditMode(xenditMode);
 
   await logAudit(session, "UPDATE", "Settings", undefined, {
     xenditMode,
@@ -424,13 +374,7 @@ function parseProductFormData(formData: FormData) {
 }
 
 export async function getEffectiveXenditMode(): Promise<"test" | "live"> {
-  const setting = await prisma.appSetting.findUnique({
-    where: { key: "xendit_mode" },
-  });
-  if (setting?.value === "live" || setting?.value === "test") {
-    return setting.value;
-  }
-  return process.env.XENDIT_MODE === "live" ? "live" : "test";
+  return getXenditMode();
 }
 
 export async function getEffectiveAppUrl(): Promise<string> {

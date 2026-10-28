@@ -32,7 +32,7 @@ export function ProductCard({
         <div
           className={
             isCatalog
-              ? "relative aspect-[3/4] overflow-hidden rounded-md bg-transparent transition-opacity group-hover:opacity-90 sm:rounded-lg"
+              ? "relative aspect-square overflow-hidden bg-white transition-opacity group-hover:opacity-90"
               : "relative aspect-[3/4] overflow-hidden bg-white transition-opacity group-hover:opacity-90"
           }
         >
@@ -45,15 +45,15 @@ export function ProductCard({
                 ? `object-cover ${product.imagePosition ?? "object-center"} saturate-0 contrast-[1.08] brightness-[0.97] transition-transform duration-500 group-hover:scale-[1.02]`
                 : "object-contain object-center p-2 transition-transform duration-500 group-hover:scale-[1.02]"
             }
-            sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 12vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           />
         </div>
         {isCatalog ? (
-          <div className="mt-3 space-y-1.5 sm:mt-4">
-            <p className="text-[11px] font-semibold tracking-[0.02em] text-black sm:text-xs">
+          <div className="mt-3 space-y-0.5 sm:mt-4">
+            <p className="text-[11px] font-normal leading-tight tracking-[-0.02em] text-black sm:text-xs">
               {product.name}
             </p>
-            <p className="text-[clamp(11px,1vw+8px,12px)] text-neutral-400">
+            <p className="text-[10px] leading-tight text-neutral-500 sm:text-[11px]">
               {formatIdr(product.price)}
             </p>
           </div>

@@ -16,10 +16,12 @@ export function resetRate(): void {
 }
 
 export function idrToUsdCents(idr: number): number {
-  if (!Number.isFinite(idr) || idr < 0) {
+  if (!Number.isSafeInteger(idr) || idr < 0 || !Number.isFinite(rateIdrToUsd) || rateIdrToUsd <= 0) {
     throw new PaymentError("invalid amount for currency conversion", {
       userMessage: "Jumlah tidak valid.",
     });
   }
-  return Math.round(idr * rateIdrToUsd * 100);
+  const cents = Math.round(idr * rateIdrToUsd * 100);
+  if (!Number.isSafeInteger(cents) || cents > 2_147_483_647) throw new Error("Converted amount exceeds supported range");
+  return cents;
 }

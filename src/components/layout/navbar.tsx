@@ -148,9 +148,13 @@ function NavbarActionButton({
  */
 function AnimatedNavbarLogo({
   isLight,
+  isHeroLayout,
+  pastHero,
   className,
 }: {
   isLight: boolean;
+  isHeroLayout?: boolean;
+  pastHero?: boolean;
   className?: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
@@ -164,7 +168,14 @@ function AnimatedNavbarLogo({
       className={cn("relative shrink-0 select-none", className)}
       style={{
         letterSpacing: OPENING_TRACKING_FINAL,
-        ...(opening ? { opacity: opening.navbarLogoOpacity } : {}),
+        opacity:
+          opening && !opening.isComplete
+            ? opening.navbarLogoOpacity
+            : isHeroLayout
+              ? pastHero
+                ? 1
+                : 0
+              : 1,
       }}
     >
       {/* Sizer: pembawa font-size + ref target pengukuran morph */}
@@ -330,7 +341,7 @@ export function Navbar({
   const revealBackground = hoverRevealEnabled && isHovered;
   const isLightSurface = isTransparent
     ? isHeroLayout
-      ? !pastHero || revealBackground
+      ? pastHero || revealBackground
       : scrolled || revealBackground
     : false;
 
@@ -400,7 +411,7 @@ export function Navbar({
             isHeroLayout ? (
               <motion.div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 z-0 bg-black"
+                className="pointer-events-none absolute inset-0 z-0 bg-white"
                 style={{ opacity: pastHeroOpacity }}
               />
             ) : (
@@ -461,6 +472,8 @@ export function Navbar({
 
                 <AnimatedNavbarLogo
                   isLight={isLightSurface}
+                  isHeroLayout={isHeroLayout}
+                  pastHero={pastHero}
                   className="relative z-10 justify-self-center"
                 />
 

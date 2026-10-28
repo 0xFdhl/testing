@@ -5,6 +5,7 @@ export type StripeCheckoutSessionStatus = "open" | "complete" | "expired";
 export type StripePaymentStatus = "unpaid" | "paid" | "no_payment_required";
 
 export type StripeCheckoutSession = {
+  livemode: boolean;
   id: string;
   object: "checkout.session";
   url: string | null;

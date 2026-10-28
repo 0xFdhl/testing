@@ -27,7 +27,7 @@ export const heroSlides = [
 
 export const shopBannerImage = {
   src: "/images/products/hoodie-zipp-diagonal.webp",
-  alt: "Alpha Jacket — yourbrand catalog",
+  alt: "Alpha Jacket — varcasvi_ catalog",
 } as const;
 
 export const featuredBannerPanels = [

@@ -82,6 +82,9 @@ model Order {
   userId           String?
   xenditInvoiceId  String?
   gatewayInvoiceId String?
+  paymentAmount    Int?
+  paymentLive      Boolean?
+  checkoutKey      String?         @unique
   invoiceUrl       String?
   provider         PaymentProvider @default(xendit)
   currency         Currency        @default(IDR)
@@ -124,6 +127,14 @@ model AdminUser {
   name         String
   role         AdminRole @default(ADMIN)
   createdAt    DateTime  @default(now())
+}
+
+model AuthThrottle {
+  key      String   @id
+  attempts Int
+  resetAt  DateTime
+
+  @@index([resetAt])
 }
 
 model AuditLog {
