@@ -32,7 +32,7 @@ export function HeroStatic() {
   const titleY = useTransform(
     smoothProgress,
     [0, 0.7, 1],
-    [0, "-45svh", "-45svh"],
+    ["0svh", "-45svh", "-45svh"],
   );
   const titleScale = useTransform(
     smoothProgress,
