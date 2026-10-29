@@ -219,8 +219,8 @@ export function Navbar({
 
   const pastHeroOpacity = useTransform(smoothScrollY, (y) => {
     if (pathnameRef.current !== "/") return 0;
-    const start = heroHeight * 0.62;
-    const end = heroHeight * 0.7;
+    const start = heroHeight * 0.48;
+    const end = heroHeight * 0.54;
     if (y <= start) return 0;
     if (y >= end) return 1;
     const t = (y - start) / (end - start);
@@ -280,7 +280,7 @@ export function Navbar({
 
   useEffect(() => {
     const updateHeroHeight = () => {
-      setHeroHeight(window.innerHeight);
+      setHeroHeight(window.innerHeight * 2.6);
     };
     updateHeroHeight();
     window.addEventListener("resize", updateHeroHeight);
@@ -296,8 +296,8 @@ export function Navbar({
       }
       setScrolled(window.scrollY > 14);
       if (isHeroLayout && pathname === "/") {
-        const start = window.innerHeight * 0.62;
-        const end = window.innerHeight * 0.7;
+        const start = window.innerHeight * 1.248;
+        const end = window.innerHeight * 1.404;
         const y = window.scrollY;
         const blend =
           y <= start ? 0 : y >= end ? 1 : (y - start) / (end - start);

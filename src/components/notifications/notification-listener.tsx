@@ -5,7 +5,7 @@ import { NotificationToast } from "@/components/notifications/notification-toast
 import { playNotificationSound, unlockAudio } from "@/lib/notifications/sound";
 import type { NotificationPayload } from "@/lib/notifications/types";
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 30_000;
 const DEV_POLL_INTERVAL_MS = 5_000;
 
 function isLocalHost(): boolean {
@@ -21,10 +21,14 @@ export function NotificationListener() {
 
   useEffect(() => {
     const unlock = () => unlockAudio();
+    let isLoading = false;
     window.addEventListener("pointerdown", unlock);
     window.addEventListener("keydown", unlock);
 
     const load = async () => {
+      if (document.visibilityState !== "visible" || isLoading) return;
+      isLoading = true;
+
       try {
         const query = sinceRef.current
           ? `?since=${encodeURIComponent(sinceRef.current)}`
@@ -49,15 +53,23 @@ export function NotificationListener() {
         }
       } catch {
         // jaringan terputus — coba lagi di interval berikutnya
+      } finally {
+        isLoading = false;
       }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") void load();
     };
 
     void load();
     const interval = isLocalHost() ? DEV_POLL_INTERVAL_MS : POLL_INTERVAL_MS;
     timerRef.current = window.setInterval(load, interval);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       if (timerRef.current !== null) window.clearInterval(timerRef.current);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
     };

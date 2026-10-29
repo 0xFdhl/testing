@@ -31,17 +31,17 @@ export function HeroStatic() {
   });
   const titleY = useTransform(
     smoothProgress,
-    [0, 0.7, 1],
+    [0, 0.8, 1],
     ["0svh", "-45svh", "-45svh"],
   );
   const titleScale = useTransform(
     smoothProgress,
-    [0, 0.7, 1],
+    [0, 0.8, 1],
     [1, smallTitleScale, smallTitleScale],
   );
   const titleOpacity = useTransform(
     smoothProgress,
-    [0, 0.66, 0.76, 1],
+    [0, 0.86, 0.94, 1],
     [1, 1, 0, 0],
   );
   const cueOpacity = useTransform(smoothProgress, [0, 0.12], [1, 0]);
@@ -63,7 +63,7 @@ export function HeroStatic() {
     <section
       ref={sectionRef}
       aria-label="varcasvi_ — discover the collection"
-      className="relative h-[190svh] w-full shrink-0 bg-black"
+      className="relative h-[260svh] w-full shrink-0 bg-black"
     >
       <div className="sticky top-0 h-svh w-full overflow-hidden bg-black">
         <Image

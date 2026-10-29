@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Pinyon_Script } from "next/font/google";
+import localFont from "next/font/local";
+import { Pinyon_Script } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+const creatoDisplay = localFont({
+  src: [
+    { path: "./fonts/creato-display/CreatoDisplay-Regular.otf", weight: "400" },
+    { path: "./fonts/creato-display/CreatoDisplay-Medium.otf", weight: "500" },
+    { path: "./fonts/creato-display/CreatoDisplay-Bold.otf", weight: "700" },
+    { path: "./fonts/creato-display/CreatoDisplay-Black.otf", weight: "900" },
+  ],
+  variable: "--font-creato-display",
   display: "swap",
 });
 
@@ -50,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} ${logoScript.variable} h-full`}>
+    <html lang="id" className={`${creatoDisplay.variable} ${logoScript.variable} h-full`}>
       <body className="min-h-full antialiased">
         <a
           href="#main-content"
