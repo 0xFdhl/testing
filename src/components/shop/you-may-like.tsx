@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { formatIdr } from "@/lib/format";
 import type { Product } from "@/lib/products";
 
@@ -21,14 +21,16 @@ export function YouMayLike({ products }: YouMayLikeProps) {
             href={`/shop/${product.slug}`}
             className="group block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-contain object-center transition-opacity duration-300 group-hover:opacity-80"
-                sizes="(max-width: 640px) 30vw, (max-width: 768px) 22vw, (max-width: 1024px) 18vw, 200px"
-              />
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-neutral-100 transition-colors group-hover:bg-neutral-200">
+              {product.image.startsWith("https://") && (
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-contain object-center transition-opacity duration-300 group-hover:opacity-80"
+                  sizes="(max-width: 640px) 30vw, (max-width: 768px) 22vw, (max-width: 1024px) 18vw, 200px"
+                />
+              )}
             </div>
             <div className="mt-2 space-y-0.5 sm:mt-2">
               <p className="truncate text-[clamp(11px,1vw+8px,12px)] font-bold tracking-[0.08em] text-black uppercase">

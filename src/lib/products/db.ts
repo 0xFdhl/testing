@@ -42,7 +42,7 @@ function mapDbProduct(p: DbProduct): Product {
     badge: p.badge ?? undefined,
     category: p.category as ProductCategory,
     sizes,
-    image: p.images[0] ?? "/images/placeholder.svg",
+    image: p.images.find((src) => src.startsWith("https://")) ?? "",
     imagePosition: "object-center",
     colors: DEFAULT_COLORS,
     price: p.price,
@@ -105,7 +105,7 @@ export const getNewArrivals = unstable_cache(
   async (): Promise<Product[]> => {
     const products = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
-      take: 20,
+      take: 30,
     });
     return (products as unknown as DbProduct[]).map(mapDbProduct);
   },

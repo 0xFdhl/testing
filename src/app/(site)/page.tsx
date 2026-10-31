@@ -14,8 +14,8 @@ export default async function HomePage() {
       <Navbar variant="transparent" layout="hero" />
       <HeroStatic />
       <div className="relative bg-white">
-        <NewArrivals products={newArrivalProducts.slice(0, 5)} />
-        <FeaturedBanner products={newArrivalProducts.slice(5, 15)} />
+        <NewArrivals products={newArrivalProducts.slice(0, 10)} />
+        <FeaturedBanner products={newArrivalProducts.slice(10, 30)} />
       </div>
     </main>
   );

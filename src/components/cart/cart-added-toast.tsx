@@ -72,14 +72,16 @@ export function CartAddedToast() {
             transition={{ delay: 0.05, duration: DURATION_FAST, ease: EASE_OUT }}
             className="flex items-center gap-3 px-4 py-3"
           >
-            <div className="relative h-14 w-12 shrink-0 bg-white">
-              <Image
-                src={addedItem.image}
-                alt={addedItem.productName}
-                fill
-                className="object-contain"
-                sizes="48px"
-              />
+            <div className="relative h-14 w-12 shrink-0 bg-neutral-100">
+              {addedItem.image.startsWith("https://") && (
+                <Image
+                  src={addedItem.image}
+                  alt={addedItem.productName}
+                  fill
+                  className="object-contain"
+                  sizes="48px"
+                />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-black lowercase">

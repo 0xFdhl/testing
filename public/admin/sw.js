@@ -21,7 +21,6 @@ self.addEventListener("push", (event) => {
   let data = {
     title: "Notification",
     body: "",
-    icon: "/icons/icon-192.png",
     url: DEFAULT_URL,
     orderId: null,
   };
@@ -34,8 +33,6 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: data.icon,
-      badge: data.icon,
       tag: orderTag(data.orderId),
       renotify: true,
       vibrate: [200, 100, 200],

@@ -90,14 +90,16 @@ export function CartCheckoutForm({
         <ul className="space-y-4">
           {items.map((item) => (
             <li key={item.id} className="flex gap-4">
-              <div className="relative h-20 w-16 shrink-0 bg-white">
-                <Image
-                  src={item.image}
-                  alt={item.productName}
-                  fill
-                  className="object-contain"
-                  sizes="64px"
-                />
+              <div className="relative h-20 w-16 shrink-0 bg-neutral-100">
+                {item.image.startsWith("https://") && (
+                  <Image
+                    src={item.image}
+                    alt={item.productName}
+                    fill
+                    className="object-contain"
+                    sizes="64px"
+                  />
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold tracking-tight text-black uppercase">

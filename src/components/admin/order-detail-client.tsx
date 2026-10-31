@@ -154,7 +154,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
               key={i}
               className="flex items-center gap-4 rounded-lg border border-zinc-800 p-3"
             >
-              {item.image ? (
+              {item.image?.startsWith("https://") ? (
                 <Image
                   src={item.image}
                   alt={item.productName}

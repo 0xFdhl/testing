@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 
 import type { Product } from "@/lib/products";
 import { formatIdr } from "@/lib/format";
@@ -16,14 +16,16 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
         className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={product.name}
       >
-        <div className="relative aspect-square overflow-hidden bg-white">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className={`object-cover ${product.imagePosition} saturate-0 contrast-[1.08] brightness-[0.97] transition-transform duration-500 group-hover:scale-[1.02]`}
-            sizes="(max-width: 768px) 72vw, 20vw"
-          />
+        <div aria-hidden className="relative aspect-square overflow-hidden bg-neutral-100 transition-colors group-hover:bg-neutral-200">
+          {product.image.startsWith("https://") && (
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              sizes="(max-width: 768px) 72vw, 20vw"
+            />
+          )}
         </div>
 
         <div className="mt-3 space-y-0.5 sm:mt-4">

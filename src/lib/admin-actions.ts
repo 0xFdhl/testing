@@ -18,6 +18,7 @@ import {
   ImageValidationError,
   StorageConfigError,
   maxUploadBytes,
+  deleteProductImages,
   uploadProductImage,
 } from "@/lib/storage";
 import {
@@ -160,6 +161,13 @@ export async function updateProductAction(
       },
     });
 
+    const removedImages = existing.images.filter((url) => !data.images.includes(url));
+    try {
+      await deleteProductImages(productId, removedImages);
+    } catch (error) {
+      console.error("Failed to remove obsolete product images from storage", error);
+    }
+
     await logAudit(session, "UPDATE", "Product", product.id, { name: product.name });
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${productId}/edit`);
@@ -174,7 +182,16 @@ export async function deleteProductAction(productId: string): Promise<ActionResu
   const session = await requireAdmin();
 
   try {
+    const existing = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { images: true },
+    });
     const product = await prisma.product.delete({ where: { id: productId } });
+    try {
+      await deleteProductImages(productId, existing?.images ?? []);
+    } catch (error) {
+      console.error("Failed to remove deleted product images from storage", error);
+    }
     await logAudit(session, "DELETE", "Product", productId, { name: product.name });
     revalidatePath("/admin/products");
     revalidateTag("products", "max");
@@ -204,24 +221,22 @@ export async function uploadProductImageAction(
   }
 
   try {
-    const { url, path } = await uploadProductImage(productId, file);
-
-    // Append ke product.images (drop entry kosong dulu untuk rapi).
-    const product = await prisma.product.findUnique({
+    const existing = await prisma.product.findUnique({
       where: { id: productId },
       select: { images: true, name: true },
     });
-    if (!product) {
-      return { success: false, error: "Product tidak ditemukan." };
-    }
-    const next = [...product.images.filter(Boolean), url];
+    if (!existing) return { success: false, error: "Product tidak ditemukan." };
+
+    const { url, path } = await uploadProductImage(productId, file);
+
+    // Atomic append avoids losing an image when two uploads finish together.
     await prisma.product.update({
       where: { id: productId },
-      data: { images: next },
+      data: { images: { push: url } },
     });
 
     await logAudit(session, "UPLOAD_IMAGE", "Product", productId, {
-      name: product.name,
+      name: existing.name,
       path,
     });
     revalidatePath(`/admin/products/${productId}/edit`);

@@ -39,7 +39,7 @@ const products = [
     price: 299_000,
     description:
       "A lightweight yet durable insulated jacket engineered for cold-weather performance. Features a water-repellent shell, thermal lining, and articulated sleeves for full mobility on the mountain.",
-    images: ["/images/products/hoodie-zipp-diagonal.webp"],
+    images: [],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 10, L: 15, XL: 7 },
     badge: "Best Seller",
@@ -56,7 +56,7 @@ const products = [
     price: 459_000,
     description:
       "Premium down parka with 800-fill goose down and a storm-proof outer shell. Designed for extreme cold with a detachable hood, fleece-lined pockets, and adjustable hem.",
-    images: ["/images/products/stella-noctis-thermal.webp"],
+    images: [],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 6, L: 10, XL: 4 },
     badge: "New",
@@ -73,7 +73,7 @@ const products = [
     price: 549_000,
     description:
       "An all-mountain freestyle snowboard with a true twin shape and medium flex. Sintered base for speed, poplar core for snap, and carbon stringers for stability at high speed.",
-    images: ["/images/products/ashley-thermal.webp"],
+    images: [],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 5, L: 8, XL: 3 },
     badge: "Popular",
@@ -90,7 +90,7 @@ const products = [
     price: 729_000,
     description:
       "Built for backcountry touring. Camber profile underfoot provides edge hold on firm snow, while the rockered tips keep you floating in powder. Includes hardware and split-specific bindings.",
-    images: ["/images/products/asuka-thermal.webp"],
+    images: [],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 4, L: 6, XL: 2 },
     colorLabel: "Camo / Black",
@@ -106,7 +106,7 @@ const products = [
     price: 259_000,
     description:
       "Heat-moldable liner, BOA lacing system, and a medium-stiff flex for all-mountain riding. Vibram outsole grips icy parking lots and the cushioned insole absorbs hard landings.",
-    images: ["/images/products/rem-boxy-tshirt.webp"],
+    images: [],
     sizes: ["M", "L", "XL"],
     stock: { XS: 0, S: 0, M: 12, L: 10, XL: 5 },
     badge: "Eco",

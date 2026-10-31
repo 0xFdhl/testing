@@ -62,14 +62,16 @@ export function CheckoutForm({
       )}
 
       <div className="flex gap-5 border-b border-black/10 pb-8">
-        <div className="relative h-28 w-24 shrink-0 bg-white">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-contain"
-            sizes="96px"
-          />
+        <div className="relative h-28 w-24 shrink-0 bg-neutral-100">
+          {product.image.startsWith("https://") && (
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-contain"
+              sizes="96px"
+            />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold tracking-[0.2em] text-black/45 uppercase">

@@ -13,9 +13,11 @@ export default function SiteLayout({
   return (
     <AuthProvider>
       <CartProvider>
-        <StoreVisitTracker />
-        {children}
-        <SiteFooter />
+        <div className="flex min-h-svh flex-col">
+          <StoreVisitTracker />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </div>
         <CartShell />
         <InstallAppBanner />
       </CartProvider>

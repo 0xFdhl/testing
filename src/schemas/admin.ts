@@ -15,18 +15,16 @@ export const productCategories = [
 export const displaySizes = ["XS", "S", "M", "L", "XL"] as const;
 
 /**
- * Valid image reference: either a site-relative path from /public/
- * (e.g. "/images/products/x.webp") or an absolute https URL.
+ * Product images must use absolute URLs. Local image assets are not stored in this project.
  */
 export const imageRef = z
   .string()
   .min(1, "Image ref is required")
   .refine(
     (v) =>
-      v.startsWith("/") ||
       /^https:\/\/.+/i.test(v) ||
       (process.env.NODE_ENV !== "production" && /^http:\/\/.+/i.test(v)),
-    "Must be a path like /images/x.webp or an https URL",
+    "Must be an absolute HTTPS URL",
   );
 
 export const productFormSchema = z.object({

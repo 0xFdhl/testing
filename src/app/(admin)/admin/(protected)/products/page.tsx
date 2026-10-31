@@ -120,7 +120,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
               return (
                 <DataTableRow key={product.id}>
                   <DataTableCell>
-                    {product.images[0] ? (
+                    {product.images[0]?.startsWith("https://") ? (
                       <Image
                         src={product.images[0]}
                         alt={product.name}

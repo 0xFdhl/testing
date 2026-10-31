@@ -60,7 +60,6 @@ async function sendPush(
   const data = JSON.stringify({
     title: payload.title,
     body: payload.message,
-    icon: "/icons/icon-192.png",
     url,
     orderId: payload.externalId,
   });

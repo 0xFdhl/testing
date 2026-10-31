@@ -84,7 +84,7 @@ describe("productFormSchema", () => {
     expect(
       productFormSchema.safeParse({
         ...validBase,
-        images: ["/images/products/x.webp"],
+        images: ["https://example.test/products/x.webp"],
       }).success,
     ).toBe(true);
   });

@@ -73,15 +73,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Tengah — gambar produk */}
       <div className="relative flex items-center justify-center md:col-span-6 lg:col-span-6">
-        <div className="relative aspect-[3/4] w-full max-w-[380px] bg-white sm:max-w-[420px] md:max-w-[400px] lg:max-w-[440px]">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            priority
-            className="object-contain object-center"
-            sizes="(max-width: 768px) 80vw, 35vw"
-          />
+        <div className="relative aspect-[3/4] w-full max-w-[380px] bg-neutral-100 sm:max-w-[420px] md:max-w-[400px] lg:max-w-[440px]">
+          {product.image.startsWith("https://") && (
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              priority
+              className="object-contain object-center"
+              sizes="(max-width: 768px) 80vw, 35vw"
+            />
+          )}
         </div>
       </div>
 

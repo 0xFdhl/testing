@@ -122,7 +122,6 @@ async function main() {
   const payload = JSON.stringify({
     title: titleRendered,
     body: messageRendered,
-    icon: "/icons/icon-192.png",
     url: `/admin/orders/${encodeURIComponent(externalId)}`,
     orderId: externalId,
   });

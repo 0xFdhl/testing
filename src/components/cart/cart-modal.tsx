@@ -124,14 +124,16 @@ export function CartModal() {
                         transition={{ duration: DURATION_FAST, ease: EASE_OUT }}
                         className="flex gap-3 overflow-hidden"
                       >
-                        <div className="relative h-20 w-16 shrink-0 bg-white">
-                          <Image
-                            src={item.image}
-                            alt={item.productName}
-                            fill
-                            className="object-contain"
-                            sizes="64px"
-                          />
+                        <div className="relative h-20 w-16 shrink-0 bg-neutral-100">
+                          {item.image.startsWith("https://") && (
+                            <Image
+                              src={item.image}
+                              alt={item.productName}
+                              fill
+                              className="object-contain"
+                              sizes="64px"
+                            />
+                          )}
                         </div>
 
                         <div className="min-w-0 flex-1">

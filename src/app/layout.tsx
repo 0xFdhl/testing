@@ -27,15 +27,8 @@ export const metadata: Metadata = {
     template: "%s | varcasvi_",
   },
   description:
-    "be better. Editorial — helmets, jackets, goggles, and more from varcasvi_.",
+    "be better",
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

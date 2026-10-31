@@ -200,13 +200,15 @@ export function NavSearch({ open, onClose, isLight }: NavSearchProps) {
                             className="flex items-center gap-4 rounded-sm py-3 transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
                           >
                             <div className="relative h-14 w-11 shrink-0 overflow-hidden bg-neutral-200">
-                              <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                sizes="44px"
-                                className="object-cover"
-                              />
+                              {product.image.startsWith("https://") && (
+                                <Image
+                                  src={product.image}
+                                  alt={product.name}
+                                  fill
+                                  sizes="44px"
+                                  className="object-cover"
+                                />
+                              )}
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-medium">

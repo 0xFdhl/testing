@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 
 const DEFAULT_BUCKET = "product-images";
 const DEFAULT_MAX_BYTES = 2 * 1024 * 1024;
@@ -85,8 +86,19 @@ function assertMimeAllowed(mime: string | null): asserts mime is AllowedImageMim
   }
 }
 
+async function assertImageSignature(file: File, mime: AllowedImageMimeType): Promise<void> {
+  const buffer = await file.slice(0, 16).arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const isPng = bytes.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => bytes[i] === b);
+  const isJpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const isWebp = bytes.length >= 12 && String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
+  const isAvif = bytes.length >= 12 && String.fromCharCode(...bytes.slice(4, 8)) === "ftyp" && /^(avif|avis)$/.test(String.fromCharCode(...bytes.slice(8, 12)));
+  const valid = mime === "image/png" ? isPng : mime === "image/jpeg" ? isJpeg : mime === "image/webp" ? isWebp : isAvif;
+  if (!valid) throw new ImageValidationError("Isi file tidak cocok dengan format gambar yang dipilih.");
+}
+
 function randomId(): string {
-  return Math.random().toString(36).slice(2, 10);
+  return randomUUID();
 }
 
 function buildObjectPath(productId: string, mime: AllowedImageMimeType): string {
@@ -121,12 +133,14 @@ export async function uploadProductImage(
     throw new ImageValidationError(`Ukuran melebihi ${mb} MB.`);
   }
 
-  assertMimeAllowed(file.type || null);
+  const mime = file.type || null;
+  assertMimeAllowed(mime);
+  await assertImageSignature(file, mime);
 
   const base = resolveProjectUrl();
   const serviceKey = requireServiceKey();
   const bucket = bucketName();
-  const path = buildObjectPath(productId, file.type as AllowedImageMimeType);
+  const path = buildObjectPath(productId, mime);
 
   const endpoint = `${base}/storage/v1/object/${bucket}/${path}`;
 
@@ -134,7 +148,7 @@ export async function uploadProductImage(
     method: "POST",
     headers: {
       Authorization: `Bearer ${serviceKey}`,
-      "Content-Type": file.type,
+      "Content-Type": mime,
       "x-upsert": "true",
     },
     body: file,
@@ -156,6 +170,34 @@ export async function uploadProductImage(
   // URL publik untuk public bucket (tanpa auth).
   const publicUrl = `${base}/storage/v1/object/public/${bucket}/${path}`;
   return { url: publicUrl, path };
+}
+
+/** Delete only managed objects belonging to one product in the configured bucket. */
+export async function deleteProductImages(productId: string, urls: string[]): Promise<void> {
+  if (!productId || urls.length === 0) return;
+  const base = resolveProjectUrl();
+  const bucket = bucketName();
+  const prefix = `/storage/v1/object/public/${bucket}/products/${productId}/`;
+  const paths = urls.flatMap((value) => {
+    try {
+      const url = new URL(value);
+      if (url.origin !== base || !url.pathname.startsWith(prefix)) return [];
+      return [decodeURIComponent(url.pathname.slice(prefix.length))];
+    } catch {
+      return [];
+    }
+  }).filter(Boolean);
+  if (paths.length === 0) return;
+
+  const response = await fetch(`${base}/storage/v1/object/${bucket}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${requireServiceKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ prefixes: paths.map((path) => `products/${productId}/${path}`) }),
+  });
+  if (!response.ok) throw new StorageConfigError(`Hapus gambar gagal (HTTP ${response.status}).`);
 }
 
 /** Domain storage (untuk next.config images.remotePatterns). */
