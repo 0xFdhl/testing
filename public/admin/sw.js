@@ -34,6 +34,8 @@ self.addEventListener("push", (event) => {
     Promise.all([
       self.registration.showNotification(data.title, {
         body: data.body,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
         tag: orderTag(data.orderId),
         renotify: true,
         vibrate: [200, 100, 200],

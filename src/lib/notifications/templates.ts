@@ -31,9 +31,8 @@ export const DEFAULT_TEMPLATES: Record<
   Omit<NotificationTemplateRecord, "event" | "enabled">
 > = {
   order_created: {
-    title: "🛒 Pesanan Baru Masuk",
-    message:
-      "Order {{order_id}} dari {{customer_name}} — {{total}}, menunggu pembayaran.",
+    title: "You have a new order",
+    message: "Order {{order_id}} · {{customer_name}} · {{total}}",
     sound: "new-order.wav",
   },
   payment_success: {
