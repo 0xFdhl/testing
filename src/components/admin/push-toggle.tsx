@@ -204,6 +204,10 @@ export function AdminPushNotificationToggle() {
           setErrorMessage(
             "Not signed in as admin. Log in again and retry enabling notifications.",
           );
+        } else if (save.status === 403) {
+          setErrorMessage(
+            "The phone opened a different site address than the server allows. Open the admin page using its official HTTPS address, then try again.",
+          );
         } else {
           setErrorMessage(
             "Could not save the subscription on the server. Try again in a moment.",
