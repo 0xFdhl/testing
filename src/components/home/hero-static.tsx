@@ -81,7 +81,7 @@ export function HeroStatic() {
             aria-label="Shop varcasvi. collection"
             className="rounded-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-8 focus-visible:ring-offset-black"
           >
-            <h1 className="select-none whitespace-nowrap font-sans text-[clamp(3.5rem,22vw,22rem)] leading-[0.78] tracking-[-0.095em]">
+          <h1 className="select-none whitespace-nowrap font-sans text-[clamp(2.5rem,15vw,15rem)] font-medium leading-[0.78] tracking-[-0.095em]"> 
               <span ref={titleRef} className="inline-block pr-[0.08em]">
                 {BRAND}
               </span>
