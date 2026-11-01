@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Pinyon_Script } from "next/font/google";
+import { PwaRegistrar } from "@/components/layout/pwa-registrar";
 import "./globals.css";
 
 const creatoDisplay = localFont({
@@ -29,6 +30,13 @@ export const metadata: Metadata = {
   description:
     "be better",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -57,6 +65,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        <PwaRegistrar />
         {children}
       </body>
     </html>

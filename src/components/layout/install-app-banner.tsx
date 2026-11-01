@@ -34,6 +34,7 @@ export function InstallAppBanner({
 
   useEffect(() => {
     if (isStandalone()) return;
+    if (isIos()) setShowIos(true);
 
     function handlePrompt(event: Event) {
       event.preventDefault();
