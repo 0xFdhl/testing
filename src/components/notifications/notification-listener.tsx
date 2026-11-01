@@ -22,8 +22,26 @@ export function NotificationListener() {
   useEffect(() => {
     const unlock = () => unlockAudio();
     let isLoading = false;
+    const seenKey = (payload: NotificationPayload) =>
+      payload.externalId
+        ? `${payload.event}:${payload.externalId}`
+        : payload.id;
+    const handleServiceWorkerMessage = (event: MessageEvent) => {
+      const data = event.data as {
+        type?: string;
+        event?: NotificationPayload["event"];
+        externalId?: string | null;
+        sound?: string | null;
+      };
+      if (data?.type !== "admin-push-notification") return;
+      if (data.event && data.externalId) {
+        seenIds.current.add(`${data.event}:${data.externalId}`);
+      }
+      playNotificationSound(data.sound ?? null);
+    };
     window.addEventListener("pointerdown", unlock);
     window.addEventListener("keydown", unlock);
+    navigator.serviceWorker?.addEventListener("message", handleServiceWorkerMessage);
 
     const load = async () => {
       if (document.visibilityState !== "visible" || isLoading) return;
@@ -46,8 +64,9 @@ export function NotificationListener() {
         }
         sinceRef.current = now;
         for (const payload of items) {
-          if (seenIds.current.has(payload.id)) continue;
-          seenIds.current.add(payload.id);
+          const key = seenKey(payload);
+          if (seenIds.current.has(key)) continue;
+          seenIds.current.add(key);
           setCurrent(payload);
           playNotificationSound(payload.sound);
         }
@@ -72,6 +91,7 @@ export function NotificationListener() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
+      navigator.serviceWorker?.removeEventListener("message", handleServiceWorkerMessage);
     };
   }, []);
 

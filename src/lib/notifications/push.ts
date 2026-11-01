@@ -62,6 +62,9 @@ async function sendPush(
     body: payload.message,
     url,
     orderId: payload.externalId,
+    event: payload.event,
+    externalId: payload.externalId,
+    sound: payload.sound,
   });
 
   await Promise.all(

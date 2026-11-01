@@ -31,13 +31,25 @@ self.addEventListener("push", (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      tag: orderTag(data.orderId),
-      renotify: true,
-      vibrate: [200, 100, 200],
-      data: { url: data.url },
-    }),
+    Promise.all([
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        tag: orderTag(data.orderId),
+        renotify: true,
+        vibrate: [200, 100, 200],
+        data: { url: data.url },
+      }),
+      self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+        for (const client of clients) {
+          client.postMessage({
+            type: "admin-push-notification",
+            event: data.event,
+            externalId: data.externalId ?? data.orderId ?? null,
+            sound: data.sound ?? null,
+          });
+        }
+      }),
+    ]),
   );
 });
 
