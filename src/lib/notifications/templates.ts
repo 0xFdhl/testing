@@ -36,19 +36,19 @@ export const DEFAULT_TEMPLATES: Record<
     sound: "new-order.wav",
   },
   payment_success: {
-    title: "💰 Pembayaran Berhasil!",
+    title: "Payment successful",
     message:
       "Halo {{customer_name}}, pembayaran untuk order {{order_id}} sebesar {{total}} telah berhasil. Status: {{status}}.",
     sound: "payment-success.wav",
   },
   payment_expired: {
-    title: "⏰ Pembayaran Kedaluwarsa",
+    title: "Payment expired",
     message:
       "Halo {{customer_name}}, pembayaran untuk order {{order_id}} telah kedaluwarsa. Silakan buat order baru.",
     sound: "payment-expired.wav",
   },
   order_cancelled: {
-    title: "❌ Order Dibatalkan",
+    title: "Order cancelled",
     message:
       "Halo {{customer_name}}, order {{order_id}} telah dibatalkan. Status: {{status}}.",
     sound: "order-cancelled.wav",
