@@ -1,4 +1,4 @@
-# yourbrand — Winter Sport Gear E-Commerce
+# yourbrand
 
 > Dual payment gateway (Xendit + Stripe) dengan routing berbasis region user.
 > Mode default: **test/sandbox**. Audit readiness produksi lama ada di [Appendix: Production Readiness Audit](#appendix-production-readiness-audit).
