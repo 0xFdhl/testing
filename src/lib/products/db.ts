@@ -14,6 +14,49 @@ const DEFAULT_COLORS: ProductColor[] = [
   { id: "white", className: "bg-white ring-1 ring-black/10", label: "White" },
 ];
 
+export const SOURCE_PRODUCTS: Product[] = [
+  {
+    id: "source-ada-wong",
+    slug: "ada-wong-double-layer-longsleeve",
+    name: "Ada Wong — Double Layer Longsleeve",
+    category: "jacket",
+    sizes: ["M", "L", "XL"],
+    image: "/products/varcasvi/Ada%20wong%20-%20Longsleeve%20double%20layer%20sleeve.webp",
+    price: 299_000,
+    description: "Double layer longsleeve. Product details and price are temporary.",
+  },
+  {
+    id: "source-jill-valentine",
+    slug: "jill-valentine-fireman-claps-jacket",
+    name: "Jill Valentine — Fire Man Claps Jacket",
+    category: "jacket",
+    sizes: ["M", "L", "XL"],
+    image: "/products/varcasvi/Fire%20man%20claps%20jacket%20-%20Jill%20valentine%20.webp",
+    price: 399_000,
+    description: "Fire Man Claps jacket. Product details and price are temporary.",
+  },
+  {
+    id: "source-misa-amane",
+    slug: "misa-amane-double-layer-sleeve",
+    name: "Misa Amane — Double Layer Sleeve",
+    category: "jacket",
+    sizes: ["M", "L", "XL"],
+    image: "/products/varcasvi/Misa%20amane%20-%20double%20layer%20sleeve.webp",
+    price: 299_000,
+    description: "Double layer sleeve. Product details and price are temporary.",
+  },
+  {
+    id: "source-nana-ren",
+    slug: "nana-ren-tees-fit",
+    name: "Nana Ren — Tees Fit",
+    category: "jacket",
+    sizes: ["M", "L", "XL"],
+    image: "/products/varcasvi/Nana%20ren%20-%20tees%20fit.webp",
+    price: 199_000,
+    description: "Tees fit. Product details and price are temporary.",
+  },
+];
+
 type DbProduct = {
   id: string;
   slug: string;
@@ -42,7 +85,7 @@ function mapDbProduct(p: DbProduct): Product {
     badge: p.badge ?? undefined,
     category: p.category as ProductCategory,
     sizes,
-    image: p.images.find((src) => src.startsWith("https://")) ?? "",
+    image: p.images[0] ?? "",
     imagePosition: "object-center",
     colors: DEFAULT_COLORS,
     price: p.price,
@@ -59,14 +102,16 @@ export async function getProductBySlug(
   slug: string,
 ): Promise<Product | undefined> {
   const p = await prisma.product.findUnique({ where: { slug } });
-  return p ? mapDbProduct(p as unknown as DbProduct) : undefined;
+  return p ? mapDbProduct(p as unknown as DbProduct) : SOURCE_PRODUCTS.find((product) => product.slug === slug);
 }
 
 export async function getAllProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
   });
-  return (products as unknown as DbProduct[]).map(mapDbProduct);
+  const mapped = (products as unknown as DbProduct[]).map(mapDbProduct);
+  const existingSlugs = new Set(mapped.map((product) => product.slug));
+  return [...mapped, ...SOURCE_PRODUCTS.filter((product) => !existingSlugs.has(product.slug))];
 }
 
 export async function searchProducts(
@@ -107,7 +152,11 @@ export const getNewArrivals = unstable_cache(
       orderBy: { createdAt: "desc" },
       take: 30,
     });
-    return (products as unknown as DbProduct[]).map(mapDbProduct);
+    const mapped = (products as unknown as DbProduct[]).map(mapDbProduct);
+    return [
+      ...SOURCE_PRODUCTS,
+      ...mapped.filter((product) => !SOURCE_PRODUCTS.some((source) => source.slug === product.slug)),
+    ];
   },
   ["new-arrivals"],
   { revalidate: 60, tags: ["products"] },

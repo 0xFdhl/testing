@@ -8,6 +8,10 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const newArrivalProducts = await getNewArrivals();
+  const featuredProducts = [
+    ...newArrivalProducts.slice(0, 4),
+    ...newArrivalProducts.slice(10, 30),
+  ];
 
   return (
     <main id="main-content" className="relative bg-white">
@@ -15,7 +19,7 @@ export default async function HomePage() {
       <HeroStatic />
       <div className="relative bg-white">
         <NewArrivals products={newArrivalProducts.slice(0, 10)} />
-        <FeaturedBanner products={newArrivalProducts.slice(10, 30)} />
+        <FeaturedBanner products={featuredProducts} />
       </div>
     </main>
   );

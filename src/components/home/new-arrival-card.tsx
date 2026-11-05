@@ -16,8 +16,8 @@ export function NewArrivalCard({ product }: NewArrivalCardProps) {
         className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={product.name}
       >
-        <div aria-hidden className="relative aspect-square overflow-hidden bg-neutral-100 transition-colors group-hover:bg-neutral-200">
-          {product.image.startsWith("https://") && (
+        <div aria-hidden className="relative aspect-square overflow-hidden bg-white">
+          {product.image && (
             <Image
               src={product.image}
               alt={product.name}

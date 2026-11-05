@@ -73,7 +73,7 @@ export function ProductGrid({
               : "No pieces in this category yet. Try another filter."}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-14">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-14">
             {filtered.map((product, i) => (
               <ProductCard
                 key={product.id}

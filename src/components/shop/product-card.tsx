@@ -32,18 +32,18 @@ export function ProductCard({
         <div
           className={
             isCatalog
-              ? "relative aspect-square overflow-hidden bg-neutral-100 transition-colors group-hover:bg-neutral-200"
+              ? "relative aspect-square overflow-hidden bg-white"
               : "relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-colors group-hover:bg-neutral-200"
           }
         >
-          {product.image.startsWith("https://") && (
+          {product.image && (
             <Image
               src={product.image}
               alt={product.name}
               fill
               className={
                 isCatalog
-                  ? `object-cover ${product.imagePosition ?? "object-center"} saturate-0 contrast-[1.08] brightness-[0.97] transition-transform duration-500 group-hover:scale-[1.02]`
+                  ? `object-cover ${product.imagePosition ?? "object-center"} transition-transform duration-500 group-hover:scale-[1.02]`
                   : "object-contain object-center p-2 transition-transform duration-500 group-hover:scale-[1.02]"
               }
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"

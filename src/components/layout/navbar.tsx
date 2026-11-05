@@ -132,19 +132,63 @@ function NavbarActionButton({
   );
 }
 
-/** Navbar wordmark that appears when the hero title moves into the header. */
+/** The homepage wordmark lives in the navbar and moves from the hero into its header position. */
 function AnimatedNavbarLogo({
   isLight,
   isHeroLayout,
-  pastHero,
+  heroHeight,
   className,
 }: {
   isLight: boolean;
   isHeroLayout?: boolean;
-  pastHero?: boolean;
+  heroHeight?: number;
   className?: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [smallTitleScale, setSmallTitleScale] = useState(0.08);
+  const { scrollY } = useScroll();
+  const smoothScrollY = useSpring(scrollY, { stiffness: 90, damping: 26, mass: 0.5 });
+  const titleY = useTransform(smoothScrollY, [0, (heroHeight ?? 720) * 0.12], ["0svh", "-45svh"]);
+  const titleScale = useTransform(smoothScrollY, [0, (heroHeight ?? 720) * 0.12], [1, smallTitleScale]);
+
+  useEffect(() => {
+    if (!isHeroLayout) return;
+    const measureTitle = () => {
+      const title = titleRef.current;
+      if (!title) return;
+      const fontSize = Number.parseFloat(window.getComputedStyle(title).fontSize);
+      if (fontSize > 0) setSmallTitleScale(Math.min(1, 22 / fontSize));
+    };
+    measureTitle();
+    window.addEventListener("resize", measureTitle);
+    return () => window.removeEventListener("resize", measureTitle);
+  }, [isHeroLayout]);
+
+  if (isHeroLayout) {
+    return (
+      <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center">
+        <motion.h1
+          ref={titleRef}
+          className="block select-none whitespace-nowrap font-sans text-[clamp(2.5rem,15vw,15rem)] font-bold leading-[0.78] tracking-[-0.14em]"
+          style={{
+            y: prefersReducedMotion ? 0 : titleY,
+            scale: prefersReducedMotion ? 1 : titleScale,
+          }}
+          animate={{ color: isLight ? "#0a0a0a" : "#ffffff" }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: NAVBAR_EASE }}
+        >
+          <Link
+            href="/"
+            aria-label="varcasvi_ home"
+            className="pointer-events-auto rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          >
+            varcasvi_
+          </Link>
+        </motion.h1>
+      </div>
+    );
+  }
 
   const textClass =
     "block select-none whitespace-nowrap font-sans text-lg font-bold leading-none tracking-[-0.14em] lowercase sm:text-xl";
@@ -153,7 +197,7 @@ function AnimatedNavbarLogo({
     <motion.span
       className={cn("relative shrink-0 select-none transition-opacity duration-300 ease-out", className)}
       style={{
-        opacity: isHeroLayout ? (pastHero ? 1 : 0) : 1,
+        opacity: 1,
       }}
     >
       <span className={cn(textClass, "relative")}>
@@ -219,8 +263,8 @@ export function Navbar({
 
   const pastHeroOpacity = useTransform(smoothScrollY, (y) => {
     if (pathnameRef.current !== "/") return 0;
-    const start = heroHeight * 0.48;
-    const end = heroHeight * 0.54;
+    const start = heroHeight * 0.11;
+    const end = heroHeight * 0.13;
     if (y <= start) return 0;
     if (y >= end) return 1;
     const t = (y - start) / (end - start);
@@ -280,7 +324,7 @@ export function Navbar({
 
   useEffect(() => {
     const updateHeroHeight = () => {
-      setHeroHeight(window.innerHeight * 2.6);
+      setHeroHeight(window.innerHeight);
     };
     updateHeroHeight();
     window.addEventListener("resize", updateHeroHeight);
@@ -296,8 +340,8 @@ export function Navbar({
       }
       setScrolled(window.scrollY > 14);
       if (isHeroLayout && pathname === "/") {
-        const start = window.innerHeight * 1.248;
-        const end = window.innerHeight * 1.404;
+        const start = window.innerHeight * 0.11;
+        const end = window.innerHeight * 0.13;
         const y = window.scrollY;
         const blend =
           y <= start ? 0 : y >= end ? 1 : (y - start) / (end - start);
@@ -447,15 +491,15 @@ export function Navbar({
                   </nav>
                 </div>
 
-                <AnimatedNavbarLogo
+        <AnimatedNavbarLogo
                   isLight={isLightSurface}
                   isHeroLayout={isHeroLayout}
-                  pastHero={pastHero}
+          heroHeight={heroHeight}
                   className="relative z-10 justify-self-center"
                 />
 
                 <div
-                  className="relative z-10 flex items-center justify-end gap-2.5 sm:gap-4 md:gap-5 lg:gap-6"
+                  className="relative z-10 col-start-3 flex items-center justify-end gap-2.5 sm:gap-4 md:gap-5 lg:gap-6"
                   onMouseEnter={
                     !isShopLayout && hoverRevealEnabled
                       ? handleHoverStart
